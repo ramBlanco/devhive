@@ -26,15 +26,21 @@ class TaskContent(BaseModel):
     tasks: List[Dict[str, Any]] = Field(..., description="Breakdown of tasks with estimates")
     estimated_complexity: str = Field(..., description="Complexity rating (Low/Medium/High)")
 
+class FileContent(BaseModel):
+    path: str = Field(..., description="Relative path to the file")
+    content: str = Field(..., description="Content of the file")
+
 class ImplementationContent(BaseModel):
     implementation_strategy: str = Field(..., description="Approach to coding the solution")
     file_structure: str = Field(..., description="Proposed file organization")
     pseudocode: str = Field(..., description="High-level logic flow")
+    files: List[FileContent] = Field(default_factory=list, description="Generated source code files")
 
 class TestingContent(BaseModel):
     test_strategy: str = Field(..., description="Overall testing approach")
     unit_tests: List[str] = Field(..., description="List of unit tests to implement")
     validation_plan: str = Field(..., description="Validation steps")
+    files: List[FileContent] = Field(default_factory=list, description="Generated test files")
 
 class VerificationContent(BaseModel):
     architecture_consistency: bool = Field(..., description="Does implementation match design?")
