@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 # Use a local workspace directory for safety and portability
-WORKSPACE_ROOT = Path("workspace/projects").resolve()
+WORKSPACE_ROOT = Path("./").resolve()
 
 def ensure_workspace():
     """Ensures the workspace directory exists."""

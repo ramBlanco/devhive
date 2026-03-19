@@ -1,121 +1,119 @@
 from typing import Dict, Any, List
-from mcp.server.fastmcp import FastMCP
-from mcp_server.orchestrator.ceo import ceo_decision_logic
-from mcp_server.schemas.project_models import ProjectState
-from mcp_server.tools.explorer import explorer_analysis
-from mcp_server.tools.proposal import product_proposal
-from mcp_server.tools.architect import architecture_design
-from mcp_server.tools.tasks import task_breakdown
-from mcp_server.tools.implementation import implementation_plan
-from mcp_server.tools.testing import testing_strategy
-from mcp_server.tools.verification import verification_report
-from mcp_server.tools.archive import archive_feature
+from mcp.server.fastmcp import FastMCP, Context
+from mcp_server.core.project_state_manager import ProjectStateManager
+from mcp_server.agents import (
+    ExplorerAgent, ProposalAgent, ArchitectAgent, TaskAgent,
+    DeveloperAgent, QAAgent, AuditorAgent, ArchivistAgent, CEOAgent
+)
 from mcp_server.utils.filesystem import list_files, read_file
-
 import sys
 from pathlib import Path
 
+# Add project root to path for imports to work correctly
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 mcp = FastMCP("DevHive Dynamic Organization")
 
-@mcp.tool()
-def create_new_project(feature_request: str) -> Dict[str, Any]:
-    """
-    Initializes a new project state with the given request.
-    Use this to start the workflow.
-    """
-    state = ProjectState(feature_request=feature_request)
-    return state.model_dump()
+# Initialize Agents
+def get_agent(role: str, project_name: str):
+    if role == "Explorer": return ExplorerAgent(project_name)
+    if role == "Proposal": return ProposalAgent(project_name)
+    if role == "Architect": return ArchitectAgent(project_name)
+    if role == "TaskPlanner": return TaskAgent(project_name)
+    if role == "Developer": return DeveloperAgent(project_name)
+    if role == "QA": return QAAgent(project_name)
+    if role == "Auditor": return AuditorAgent(project_name)
+    if role == "Archivist": return ArchivistAgent(project_name)
+    if role == "CEO": return CEOAgent(project_name)
+    raise ValueError(f"Unknown role: {role}")
 
 @mcp.tool()
-def ceo_decision(project_state: Dict[str, Any]) -> Dict[str, Any]:
+async def build_feature(feature_request: str, project_name: str, ctx: Context) -> str:
     """
-    The CEO Agent reviews the project state and recommends the next role/tool to call.
-    Always call this tool after a role tool completes to decide what to do next.
+    Triggers the AI Development Team to build a feature.
+    This orchestrates the entire process: Analysis -> Plan -> Code -> Test -> Archive.
+    It runs in a loop, asking the CEO agent for decisions.
     """
-    return ceo_decision_logic(project_state)
+    # 1. Initialize Project
+    state_manager = ProjectStateManager(project_name)
+    state = state_manager.get_state()
+    
+    # Simple check if new project
+    if state["stage"] == "initialization":
+        # we could verify if feature_request matches?
+        pass
+
+    ceo = CEOAgent(project_name)
+    
+    steps_log = []
+    max_steps = 15 # Safety limit
+    
+    for i in range(max_steps):
+        # CEO Decision
+        # CEO execute returns dict with decision
+        decision = await ceo.execute(ctx)
+        
+        # Parse decision - handle if it's a string (raw LLM output) or dict
+        if isinstance(decision, str):
+             # Try to parse if LLM returned string despite instructions
+             import json
+             try:
+                 decision = json.loads(decision)
+             except:
+                 decision = {"decision": "Wait", "reason": f"Failed to parse CEO output: {decision}"}
+
+        action = decision.get("decision", "Wait")
+        reason = decision.get("reason", "No reason provided")
+        
+        steps_log.append(f"Step {i+1}: CEO decided '{action}' ({reason})")
+        
+        if isinstance(action, str) and action.startswith("Run "):
+            role = action.split("Run ")[1].strip()
+            
+            # Special case for Archivist to stop loop
+            if role == "Archivist":
+                agent = get_agent("Archivist", project_name)
+                res = await agent.execute(ctx)
+                steps_log.append(f"Result: {res}")
+                return "\n".join(steps_log)
+            
+            try:
+                agent = get_agent(role, project_name)
+                
+                # Input mapping
+                res = None
+                if role == "Explorer":
+                    # Pass the feature request
+                    res = await agent.execute(ctx, requirements=feature_request)
+                else:
+                    # Others pull from context mainly
+                    res = await agent.execute(ctx)
+                    
+                steps_log.append(f"Result: Success (Artifact ID: {res})")
+                
+            except Exception as e:
+                steps_log.append(f"Result: Failed to run {role} ({str(e)})")
+                # Don't break immediately, maybe CEO recovers? 
+                # But typically retry logic is needed.
+                # For now, let's break to avoid infinite loops of errors.
+                break
+        elif action == "Wait":
+             steps_log.append("CEO decided to wait.")
+             break
+        else:
+             steps_log.append(f"Unknown decision format: {action}")
+             break
+             
+    return "\n".join(steps_log)
 
 @mcp.tool()
-def explorer_tool(project_state: Dict[str, Any], user_needs: list[str], constraints: list[str], dependencies: list[str], risks: list[str]) -> Dict[str, Any]:
-    """
-    Analyst Role: Records the requirements analysis.
-    Arguments must be generated by the Agent based on the feature request.
-    """
-    return explorer_analysis(project_state, user_needs, constraints, dependencies, risks)
-
-@mcp.tool()
-def proposal_tool(project_state: Dict[str, Any], feature_description: str, user_value: str, acceptance_criteria: list[str], scope: str) -> Dict[str, Any]:
-    """
-    Product Manager Role: Records the product proposal.
-    Arguments must be generated by the Agent based on the analysis.
-    """
-    return product_proposal(project_state, feature_description, user_value, acceptance_criteria, scope)
-
-@mcp.tool()
-def architect_tool(project_state: Dict[str, Any], architecture_pattern: str, components: list[str], data_models: list[dict], apis: list[str]) -> Dict[str, Any]:
-    """
-    Tech Lead Role: Records the architecture design.
-    Arguments must be generated by the Agent based on the proposal.
-    """
-    return architecture_design(project_state, architecture_pattern, components, data_models, apis)
-
-@mcp.tool()
-def scrum_tool(project_state: Dict[str, Any], epics: list[str], tasks: list[dict], estimated_complexity: str) -> Dict[str, Any]:
-    """
-    Scrum Master Role: Records the task breakdown.
-    Arguments must be generated by the Agent based on the architecture.
-    """
-    return task_breakdown(project_state, epics, tasks, estimated_complexity)
-
-@mcp.tool()
-def developer_tool(project_state: Dict[str, Any], implementation_strategy: str, file_structure: str, pseudocode: str, files: List[Dict[str, str]]) -> Dict[str, Any]:
-    """
-    Developer Role: Generates the real project structure and code.
-    Arguments must be generated by the Agent based on the tasks.
-    'files' must be a list of dicts with 'path' and 'content' keys.
-    """
-    return implementation_plan(project_state, implementation_strategy, file_structure, pseudocode, files)
-
-@mcp.tool()
-def qa_tool(project_state: Dict[str, Any], test_strategy: str, unit_tests: list[str], validation_plan: str, test_files: List[Dict[str, str]]) -> Dict[str, Any]:
-    """
-    QA Role: Generates unit tests and records the testing strategy.
-    Arguments must be generated by the Agent based on the implementation plan.
-    'test_files' must be a list of dicts with 'path' and 'content' keys.
-    """
-    return testing_strategy(project_state, test_strategy, unit_tests, validation_plan, test_files)
-
-@mcp.tool()
-def auditor_tool(project_state: Dict[str, Any], architecture_consistency: bool, missing_pieces: list[str], security_risks: list[str]) -> Dict[str, Any]:
-    """
-    Auditor Role: Records the verification report.
-    Arguments must be generated by the Agent after reviewing the whole project.
-    """
-    return verification_report(project_state, architecture_consistency, missing_pieces, security_risks)
-
-@mcp.tool()
-def archivist_tool(project_state: Dict[str, Any], project_summary: str) -> Dict[str, Any]:
-    """
-    Archivist Role: Archives the completed project.
-    Arguments must be generated by the Agent.
-    """
-    return archive_feature(project_state, project_summary)
-
-@mcp.tool()
-def list_files_tool(path: str = ".") -> List[str]:
-    """
-    Lists files in the workspace directory recursively.
-    Use this to verify file creation or explore the project structure.
-    Returns relative paths from workspace root.
-    """
+def list_workspace_files(path: str = ".") -> List[str]:
+    """Lists files in the project workspace."""
     return list_files(path)
 
 @mcp.tool()
-def read_file_tool(path: str) -> str:
-    """
-    Reads a file from the workspace.
-    """
+def read_workspace_file(path: str) -> str:
+    """Reads a file from the project workspace."""
     return read_file(path)
 
 def main():
