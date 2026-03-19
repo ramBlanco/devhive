@@ -11,6 +11,11 @@ from mcp_server.tools.testing import testing_strategy
 from mcp_server.tools.verification import verification_report
 from mcp_server.tools.archive import archive_feature
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 mcp = FastMCP("DevHive Dynamic Organization")
 
 @mcp.tool()

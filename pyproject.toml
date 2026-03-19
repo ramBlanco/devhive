@@ -1,0 +1,16 @@
+[project]
+name = "devhive-mcp"
+version = "0.1.0"
+description = "DevHive MCP Server"
+requires-python = ">=3.10"
+
+dependencies = [
+    "mcp"
+]
+
+[project.scripts]
+devhive-mcp = "mcp_server.server:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
