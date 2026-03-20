@@ -1,10 +1,12 @@
 import json
 import logging
 from typing import Dict, Any, Optional
+from mcp.types import SamplingMessage, TextContent
 from mcp.server.fastmcp import Context
 from mcp_server.core.project_state_manager import ProjectStateManager
 from mcp_server.core.artifact_manager import ArtifactManager
 from mcp_server.core.context_router import ContextRouter
+from mcp_server.core.llm import LLM
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,16 @@ class BaseAgent:
         self.state_manager.update_artifact(step_name, aid)
         return aid
 
-    async def _call_llm(self, ctx: Context, system_prompt: str, user_prompt: str, max_tokens: int = 2000) -> str:
+    async def _call_llm(self, ctx: Context, system_prompt: str, user_prompt: str, max_tokens: int = 2000)-> str:
+        decision = await LLM.generate_json(
+            ctx,
+            system_prompt,
+            user_prompt
+        )
+        return json.dumps(decision)
+
+
+    async def _call_llm_old(self, ctx: Context, system_prompt: str, user_prompt: str, max_tokens: int = 2000) -> str:
         """Helper to call LLM via Sampling."""
         try:
             messages = [

@@ -53,8 +53,6 @@ class ProjectStateManager:
 
     def update_artifact(self, step: str, artifact_id: str):
         state = self.get_state()
-        if "artifacts" not in state:
-            state["artifacts"] = {}
         state["artifacts"][step] = artifact_id
         self.update_state(state)
         

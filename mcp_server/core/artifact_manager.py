@@ -2,15 +2,18 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 from mcp_server.utils.filesystem import write_file, read_file, get_safe_path
+import logging
 
 class ArtifactManager:
     def __init__(self, project_name: str):
         self.project_name = project_name
-        self.artifacts_dir = f"{project_name}/artifacts"
+        self.artifacts_dir = f"./{project_name}/artifacts"
         # Ensure dir exists (via filesystem util)
         try:
             get_safe_path(self.artifacts_dir).mkdir(parents=True, exist_ok=True)
+            logging.info(f"Saving artifact {self.artifacts_dir}")
         except:
+            logging.error(f"Artifact failed {self.artifacts_dir}")
             pass # Might already exist
 
     def save_artifact(self, step_name: str, content: Dict[str, Any], artifact_id: Optional[str] = None) -> str:
