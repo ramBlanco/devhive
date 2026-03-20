@@ -26,6 +26,22 @@ class BaseAgent:
         aid = self.artifact_manager.save_artifact(step_name, content)
         self.state_manager.update_artifact(step_name, aid)
         return aid
+    
+    def generate_summary(self, data: Dict[str, Any]) -> str:
+        """
+        Generate a 1-3 sentence executive summary of the agent's work.
+        
+        This default implementation provides a basic summary. Subclasses should
+        override this method to provide more specific summaries based on their
+        role and the data they produce.
+        
+        Args:
+            data: The artifact data produced by the agent
+        
+        Returns:
+            A concise 1-3 sentence summary suitable for orchestrator context
+        """
+        return f"{self.role} completed successfully."
 
     async def _call_llm(self, ctx: Context, system_prompt: str, user_prompt: str, max_tokens: int = 2000)-> str:
         decision = await LLM.generate_json(

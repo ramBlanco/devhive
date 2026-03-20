@@ -1,4 +1,5 @@
 import json
+from typing import Dict, Any
 from mcp.server.fastmcp import Context
 from mcp_server.agents.base_agent import BaseAgent
 
@@ -11,3 +12,8 @@ class ArchivistAgent(BaseAgent):
         state["artifacts"]["archive"] = "archived"
         self.state_manager.update_state(state)
         return "Project Archived Successfully"
+    
+    def generate_summary(self, data: Dict[str, Any]) -> str:
+        """Generate executive summary for Archivist agent."""
+        # Archivist doesn't use structured data, just returns success message
+        return "Project archived successfully. All artifacts and state preserved."

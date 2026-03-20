@@ -55,13 +55,121 @@ def _parse_json_response(text: str) -> Dict[str, Any]:
         raise ValueError(f"Invalid JSON response: {e}")
 
 # ============================================================================
-# MANUAL WORKFLOW TOOLS (OpenCode Compatible - No Sampling Required)
+# TASK-BASED WORKFLOW TOOLS (Recommended - Uses OpenCode Task Tool)
+# ============================================================================
+
+@mcp.tool()
+def devhive_start_pipeline(project_name: str, requirements: str) -> str:
+    """
+    Start a new DevHive pipeline with Task-based execution.
+    
+    This is the RECOMMENDED way to use DevHive. It returns Task launch instructions
+    that OpenCode can use to execute each agent in isolated context.
+    
+    Args:
+        project_name: Project identifier (will be created if doesn't exist)
+        requirements: Feature request or requirements description
+    
+    Returns:
+        JSON with Task launch instructions:
+        - status: "pending" (next task ready) or "complete" (pipeline done)
+        - agent: Next agent to run (Explorer, Proposal, etc.)
+        - reason: Why this agent needs to run
+        - system_prompt: System prompt for the Task
+        - user_prompt: User prompt for the Task
+        - task_description: Short description for Task tool
+        - expected_keys: Keys the LLM should return
+        - context: Minimal context for debugging
+    
+    Example:
+        result = devhive_start_pipeline("csv_export", "Add CSV export to dashboard")
+        # Use result["system_prompt"] and result["user_prompt"] with OpenCode Task tool
+        # Then call devhive_submit_result() with the Task output
+    """
+    try:
+        from mcp_server.core.task_orchestrator import TaskOrchestrator
+        
+        # Initialize orchestrator (creates project if needed)
+        orchestrator = TaskOrchestrator(project_name)
+        
+        # Get first task (Explorer)
+        task_info = orchestrator.get_next_task(requirements=requirements)
+        
+        return json.dumps(task_info, indent=2)
+        
+    except Exception as e:
+        logger.error(f"devhive_start_pipeline failed: {e}", exc_info=True)
+        return json.dumps({
+            "status": "error",
+            "message": f"Failed to start pipeline: {str(e)}"
+        }, indent=2)
+
+@mcp.tool()
+def devhive_submit_result(project_name: str, agent_name: str, llm_response: str) -> str:
+    """
+    Submit an agent's result and get next Task instructions.
+    
+    After executing an agent via Task tool, call this to validate the result,
+    save the artifact, and get instructions for the next Task.
+    
+    Args:
+        project_name: Project identifier
+        agent_name: Name of agent that produced result (Explorer, Proposal, Architect,
+                   TaskPlanner, Developer, QA, Auditor, or Archivist)
+        llm_response: Raw LLM response (JSON string, can include markdown code blocks)
+    
+    Returns:
+        JSON with:
+        - status: "success" or "error"
+        - message: Human-readable status message
+        - agent_completed: Name of agent that just finished
+        - artifact_id: ID of saved artifact
+        - executive_summary: 1-3 sentence summary of what was done
+        - next_agent: Next agent to run (or None if complete)
+        - next_task: Complete Task launch instructions for next agent
+    
+    Example:
+        # After Task completes with LLM response
+        result = devhive_submit_result("csv_export", "Explorer", llm_response)
+        if result["status"] == "success":
+            print(result["executive_summary"])
+            next_task = result["next_task"]
+            # Use next_task with OpenCode Task tool
+    """
+    try:
+        from mcp_server.core.task_orchestrator import TaskOrchestrator
+        
+        orchestrator = TaskOrchestrator(project_name)
+        
+        # Submit result and get envelope
+        envelope = orchestrator.submit_result(agent_name, llm_response)
+        
+        # If successful, append next task info
+        if envelope["status"] == "success" and envelope.get("next_agent"):
+            next_task = orchestrator.get_next_task()
+            envelope["next_task"] = next_task
+        
+        return json.dumps(envelope, indent=2)
+        
+    except Exception as e:
+        logger.error(f"devhive_submit_result failed: {e}", exc_info=True)
+        return json.dumps({
+            "status": "error",
+            "message": f"Failed to submit result: {str(e)}",
+            "expected_keys": ResponseValidator.get_expected_keys(agent_name) if agent_name else []
+        }, indent=2)
+
+# ============================================================================
+# MANUAL WORKFLOW TOOLS (Legacy - Use Task-Based Tools Above Instead)
 # ============================================================================
 
 @mcp.tool()
 def get_next_step(project_name: str) -> str:
     """
-    Returns the next agent to run and the prompts to send to LLM.
+    [LEGACY] Returns the next agent to run and the prompts to send to LLM.
+    
+    ⚠️ DEPRECATED: Use devhive_start_pipeline() and devhive_submit_result() instead.
+    The new Task-based workflow provides better context isolation.
     
     This tool determines which agent should execute next based on the current
     project state. It returns the complete system and user prompts that should

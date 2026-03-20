@@ -1,8 +1,8 @@
-# DevHive Manual Workflow Guide
+# DevHive Workflow Guide
 
-**For OpenCode and other MCP clients without sampling support**
+**For OpenCode and other MCP clients**
 
-This guide explains how to use DevHive's AI development team through manual step-by-step execution.
+This guide explains how to use DevHive's AI development team through your MCP client.
 
 ## Overview
 
@@ -12,7 +12,166 @@ DevHive orchestrates an AI development team through 8 specialized agents in a se
 Explorer → Proposal → Architect → TaskPlanner → Developer → QA → Auditor → Archivist
 ```
 
-Since OpenCode doesn't yet support MCP sampling (automatic LLM calls), you'll manually:
+There are two ways to use DevHive:
+
+1. **Task-Based Workflow (Recommended)** - Uses OpenCode's Task tool for isolated agent contexts
+2. **Manual Workflow (Legacy)** - Manual step-by-step execution
+
+---
+
+## Task-Based Workflow (Recommended)
+
+**Best for:** Optimal context isolation and reduced token usage
+
+### Why Task-Based?
+
+Each agent runs in a **fresh, isolated Task context**, which:
+- ✅ Prevents context pollution across agents
+- ✅ Reduces total token usage (no accumulated context)
+- ✅ Provides cleaner separation of concerns
+- ✅ Matches agent-teams-lite architecture patterns
+
+### Quick Start
+
+#### 1. Start the Pipeline
+
+```python
+devhive_start_pipeline("my_project", "Add CSV export to dashboard")
+```
+
+**Response:**
+```json
+{
+  "status": "pending",
+  "agent": "Explorer",
+  "reason": "Need initial feature analysis and exploration",
+  "system_prompt": "You are the Analyst (Explorer). Output JSON only.",
+  "user_prompt": "Analyze the following feature request: ...",
+  "task_description": "Execute DevHive Explorer agent",
+  "expected_keys": ["user_needs", "constraints", "dependencies", "risks"],
+  "context": {
+    "project": "my_project",
+    "stage": "initialization",
+    "artifacts_present": []
+  }
+}
+```
+
+#### 2. Create Task with Prompts
+
+Use OpenCode's Task tool with the returned prompts:
+
+```javascript
+// OpenCode Task tool
+task({
+  subagent_type: "general",
+  description: result.task_description,
+  prompt: `${result.system_prompt}\n\n${result.user_prompt}`
+})
+```
+
+The Task executes with fresh context and returns the LLM's response.
+
+#### 3. Submit Result
+
+```python
+devhive_submit_result(
+    "my_project",
+    "Explorer",
+    task_response  # JSON from Task execution
+)
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Explorer completed successfully",
+  "agent_completed": "Explorer",
+  "artifact_id": "exploration_1710875432",
+  "executive_summary": "Analyzed requirements and identified 3 constraints and 2 dependencies. Key user need: Users need to export data in CSV format for analysis...",
+  "next_agent": "Proposal",
+  "next_reason": "Exploration complete, need feature proposal",
+  "next_task": {
+    "status": "pending",
+    "agent": "Proposal",
+    "system_prompt": "...",
+    "user_prompt": "...",
+    ...
+  }
+}
+```
+
+#### 4. Continue Pipeline
+
+The response includes `next_task` with prompts for the next agent. Create another Task and repeat:
+
+```javascript
+// Use next_task from previous response
+task({
+  subagent_type: "general",
+  description: result.next_task.task_description,
+  prompt: `${result.next_task.system_prompt}\n\n${result.next_task.user_prompt}`
+})
+```
+
+Then submit:
+
+```python
+devhive_submit_result("my_project", "Proposal", task_response)
+```
+
+#### 5. Repeat Until Complete
+
+Continue until `next_agent` is `null` and the pipeline is complete.
+
+### Benefits Over Manual Workflow
+
+| Feature | Task-Based | Manual |
+|---------|-----------|--------|
+| Context per agent | Fresh (isolated) | Accumulated |
+| Token usage | Lower (no bloat) | Higher (context grows) |
+| Executive summaries | ✅ Yes (concise) | ❌ No (full artifacts) |
+| Orchestrator overhead | Minimal (tracks summaries only) | Higher (tracks full context) |
+| Error recovery | Easier (isolated failures) | Harder (state corruption) |
+
+### Complete Example
+
+```python
+# 1. Start pipeline
+result = devhive_start_pipeline("csv_export", "Add CSV export feature")
+
+# 2. Loop through all agents
+while result.get("status") == "pending" or result.get("next_agent"):
+    # Create Task with prompts
+    task_response = task({
+        subagent_type: "general",
+        description: result["task_description"],
+        prompt: f"{result['system_prompt']}\n\n{result['user_prompt']}"
+    })
+    
+    # Submit result
+    agent_name = result["agent"]
+    result = devhive_submit_result("csv_export", agent_name, task_response)
+    
+    # Show summary
+    if result["status"] == "success":
+        print(f"✅ {result['agent_completed']}: {result['executive_summary']}")
+        result = result.get("next_task", {})
+    else:
+        print(f"❌ Error: {result['message']}")
+        break
+
+print("🎉 Pipeline complete!")
+```
+
+---
+
+## Manual Workflow (Legacy)
+
+**⚠️ DEPRECATED:** Consider using Task-Based Workflow above for better results.
+
+Since some MCP clients don't support MCP sampling (automatic LLM calls), you can manually:
 1. Get prompts from DevHive
 2. Send them to your LLM
 3. Return the response back to DevHive
