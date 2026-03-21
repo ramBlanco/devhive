@@ -653,6 +653,132 @@ async def build_feature(feature_request: str, project_name: str, ctx: Context) -
     }, indent=2)
 
 # ============================================================================
+# MEMORY & CONTEXT OPTIMIZATION TOOLS (RAG with TF-IDF)
+# ============================================================================
+
+@mcp.tool()
+def devhive_search_memory(project_name: str, query: str, top_k: int = 5, chunk_types: List[str] = None) -> str:
+    """
+    Search project memory using TF-IDF similarity for context retrieval.
+    
+    This tool allows agents to actively search for relevant information from
+    previous pipeline stages instead of loading everything into context.
+    
+    Args:
+        project_name: Project identifier
+        query: Search query (e.g., "database schema", "authentication requirements")
+        top_k: Number of results to return (default: 5)
+        chunk_types: Filter by types: ["artifact", "system_prompt", "user_prompt", "agent_response"]
+    
+    Returns:
+        JSON with search results sorted by relevance
+    
+    Example:
+        devhive_search_memory("csv_export", "database schema design", top_k=3, chunk_types=["artifact"])
+    """
+    try:
+        from mcp_server.core.memory_store import MemoryStore
+        
+        memory_store = MemoryStore(project_name)
+        results = memory_store.search_memory(
+            query=query,
+            top_k=top_k,
+            chunk_types=chunk_types
+        )
+        
+        return json.dumps({
+            "status": "success",
+            "query": query,
+            "total_results": len(results),
+            "results": [{
+                "chunk_type": r["chunk_type"],
+                "agent_name": r["agent_name"],
+                "step_name": r["step_name"],
+                "content": r["content"][:500] + "..." if len(r["content"]) > 500 else r["content"],
+                "relevance_score": round(r["relevance_score"], 4),
+                "content_hash": r["content_hash"][:8]
+            } for r in results]
+        }, indent=2)
+        
+    except Exception as e:
+        logger.error(f"Memory search failed: {e}")
+        return json.dumps({
+            "status": "error",
+            "message": str(e)
+        }, indent=2)
+
+@mcp.tool()
+def devhive_get_memory_stats(project_name: str) -> str:
+    """
+    Get statistics about the project's memory store.
+    
+    Args:
+        project_name: Project identifier
+    
+    Returns:
+        JSON with memory statistics (total chunks, chunks by type, database size)
+    """
+    try:
+        from mcp_server.core.memory_store import MemoryStore
+        
+        memory_store = MemoryStore(project_name)
+        stats = memory_store.get_statistics()
+        
+        return json.dumps({
+            "status": "success",
+            "statistics": stats
+        }, indent=2)
+        
+    except Exception as e:
+        logger.error(f"Failed to get memory stats: {e}")
+        return json.dumps({
+            "status": "error",
+            "message": str(e)
+        }, indent=2)
+
+@mcp.tool()
+def devhive_get_recent_memories(project_name: str, limit: int = 10, chunk_types: List[str] = None) -> str:
+    """
+    Get most recent memory chunks from the project.
+    
+    Args:
+        project_name: Project identifier
+        limit: Number of memories to return (default: 10)
+        chunk_types: Filter by types (optional)
+    
+    Returns:
+        JSON with recent memory chunks
+    """
+    try:
+        from mcp_server.core.memory_store import MemoryStore
+        
+        memory_store = MemoryStore(project_name)
+        memories = memory_store.get_recent_memories(
+            limit=limit,
+            chunk_types=chunk_types
+        )
+        
+        return json.dumps({
+            "status": "success",
+            "total": len(memories),
+            "memories": [{
+                "chunk_type": m["chunk_type"],
+                "agent_name": m["agent_name"],
+                "step_name": m["step_name"],
+                "content": m["content"][:300] + "..." if len(m["content"]) > 300 else m["content"],
+                "created_at": m["created_at"],
+                "content_hash": m["content_hash"][:8]
+            } for m in memories]
+        }, indent=2)
+        
+    except Exception as e:
+        logger.error(f"Failed to get recent memories: {e}")
+        return json.dumps({
+            "status": "error",
+            "message": str(e)
+        }, indent=2)
+
+# ============================================================================
 # UTILITY TOOLS
 # ============================================================================
 

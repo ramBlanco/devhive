@@ -7,6 +7,11 @@ class PromptBuilder:
     Centralized prompt generation for all agents.
     Extracts prompts from agent logic to enable manual LLM execution.
     """
+    
+    # Memory search capability note (for hybrid RAG mode)
+    MEMORY_SEARCH_NOTE = """
+
+Note: You have access to the devhive_search_memory tool if you need to find specific information from previous pipeline stages. Use it to search for details like architecture decisions, requirements, or implementation specifics."""
 
     @staticmethod
     def build_prompts(agent_role: str, context: Dict[str, Any], **kwargs) -> Dict[str, str]:
@@ -162,7 +167,7 @@ Example format:
 
     @staticmethod
     def _build_developer_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are the Developer. Output JSON only."
+        system_prompt = f"You are the Developer. Output JSON only.{PromptBuilder.MEMORY_SEARCH_NOTE}"
         
         user_prompt = f"""Implement the feature based on architecture and tasks.
 
@@ -198,7 +203,7 @@ IMPORTANT: Include actual code in the 'files' array. Each file should have 'path
 
     @staticmethod
     def _build_qa_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are QA. Output JSON only."
+        system_prompt = f"You are QA. Output JSON only.{PromptBuilder.MEMORY_SEARCH_NOTE}"
         
         user_prompt = f"""Generate tests for the implementation.
 

@@ -11,6 +11,7 @@ from mcp_server.core.project_state_manager import ProjectStateManager
 from mcp_server.core.artifact_manager import ArtifactManager
 from mcp_server.core.prompt_builder import PromptBuilder
 from mcp_server.core.context_router import ContextRouter
+from mcp_server.core.memory_store import MemoryStore
 from mcp_server.agents.ceo import CEOAgent
 from mcp_server.utils.validation import ResponseValidator
 
@@ -33,7 +34,12 @@ class TaskOrchestrator:
         self.project_name = project_name
         self.state_manager = ProjectStateManager(project_name)
         self.artifact_manager = ArtifactManager(project_name)
-        self.context_router = ContextRouter(self.state_manager, self.artifact_manager)
+        self.memory_store = MemoryStore(project_name)
+        self.context_router = ContextRouter(
+            self.state_manager, 
+            self.artifact_manager,
+            self.memory_store  # Enable hybrid TF-IDF retrieval
+        )
         self.ceo = CEOAgent(project_name)
         
     def get_next_task(self, requirements: Optional[str] = None) -> Dict[str, Any]:
@@ -85,6 +91,20 @@ class TaskOrchestrator:
         
         # Get expected keys for validation help
         expected_keys = ResponseValidator.get_expected_keys(next_agent)
+        
+        # Store prompts in memory database
+        self.memory_store.store_memory(
+            chunk_type="system_prompt",
+            content=prompts["system_prompt"],
+            agent_name=next_agent,
+            metadata={"requirements": requirements}
+        )
+        self.memory_store.store_memory(
+            chunk_type="user_prompt",
+            content=prompts["user_prompt"],
+            agent_name=next_agent,
+            metadata={"context_keys": list(context.keys())}
+        )
         
         return {
             "status": "pending",
@@ -167,6 +187,22 @@ class TaskOrchestrator:
         
         # Generate executive summary
         summary = self._generate_summary(agent_name, data)
+        
+        # Store agent response and artifact in memory database
+        self.memory_store.store_memory(
+            chunk_type="agent_response",
+            content=llm_response,
+            agent_name=agent_name,
+            step_name=artifact_key,
+            metadata={"artifact_id": artifact_id, "summary": summary}
+        )
+        self.memory_store.store_memory(
+            chunk_type="artifact",
+            content=json.dumps(data, indent=2),
+            agent_name=agent_name,
+            step_name=artifact_key,
+            metadata={"artifact_id": artifact_id}
+        )
         
         # Get next agent
         next_decision = self.ceo.get_next_agent_deterministic()
