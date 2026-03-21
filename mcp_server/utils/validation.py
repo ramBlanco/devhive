@@ -12,9 +12,9 @@ class ResponseValidator:
         """
         Validate Explorer agent response.
         
-        Expected keys: user_needs, constraints, dependencies, risks
+        Expected keys: user_needs, constraints, dependencies, risks, complexity, suggested_workflow
         """
-        required_keys = ["user_needs", "constraints", "dependencies", "risks"]
+        required_keys = ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow"]
         return ResponseValidator._validate_keys(response, required_keys, "Explorer")
 
     @staticmethod
@@ -163,7 +163,7 @@ class ResponseValidator:
             List of expected key names
         """
         key_mapping = {
-            "Explorer": ["user_needs", "constraints", "dependencies", "risks"],
+            "Explorer": ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow"],
             "Proposal": ["feature_description", "user_value", "acceptance_criteria", "scope"],
             "Architect": ["architecture_pattern", "components", "data_models", "apis"],
             "TaskPlanner": ["epics", "tasks", "estimated_complexity"],

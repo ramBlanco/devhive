@@ -4,7 +4,7 @@ from pathlib import Path
 class ProjectStateManager:
     def __init__(self, project_name: str):
         self.project_name = project_name
-        self.state_file = f"{project_name}/project_state.json"
+        self.state_file = f"./.devhive/project_state.json"
         
         try:
             from mcp_server.utils.filesystem import get_safe_path, read_file

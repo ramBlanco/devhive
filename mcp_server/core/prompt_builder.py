@@ -63,13 +63,20 @@ Return JSON with the following keys:
 - constraints: List of technical or business constraints
 - dependencies: List of external dependencies or requirements
 - risks: List of potential risks or challenges
+- complexity: "low", "medium", or "high". 
+  - "low": Simple changes, no architecture needed.
+  - "medium": Moderate changes, needs proposal but no complex architecture.
+  - "high": Complex changes, needs full architecture and planning.
+- suggested_workflow: "fast_track" (low), "standard" (medium), or "comprehensive" (high)
 
 Example format:
 {{
   "user_needs": "Users need to export data in CSV format for analysis",
   "constraints": ["Must work with existing authentication", "Limited to 10MB file size"],
   "dependencies": ["CSV library", "File storage system"],
-  "risks": ["Large datasets may cause performance issues", "Security concerns with file downloads"]
+  "risks": ["Large datasets may cause performance issues", "Security concerns with file downloads"],
+  "complexity": "medium",
+  "suggested_workflow": "standard"
 }}"""
         
         return {
@@ -169,8 +176,8 @@ Example format:
     def _build_developer_prompts(context: Dict[str, Any]) -> Dict[str, str]:
         system_prompt = f"You are the Developer. Output JSON only.{PromptBuilder.MEMORY_SEARCH_NOTE}"
         
-        user_prompt = f"""Implement the feature based on architecture and tasks.
-
+        user_prompt = f"""Implement the feature based on available specifications (requirements, proposal, or architecture).
+        
 Context: {json.dumps(context, default=str)}
 
 Your task is to create the implementation plan and code.

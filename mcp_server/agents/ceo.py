@@ -34,29 +34,53 @@ class CEOAgent(BaseAgent):
                 "agent": "Explorer",
                 "reason": "Need initial feature analysis and exploration"
             }
+            
+        # Determine complexity from exploration artifact
+        complexity = "high" # Default to high safety
+        try:
+            expl_id = artifacts.get("exploration")
+            if expl_id:
+                expl_data = self.artifact_manager.load_artifact(expl_id)
+                complexity = expl_data.get("complexity", "high").lower()
+        except Exception:
+            pass # Fallback to high complexity on error
+        
+        # Dynamic Routing based on Complexity
+        # Low: Explorer -> Developer -> QA -> Archivist
+        # Medium: Explorer -> Proposal -> Developer -> QA -> Archivist
+        # High: Full Suite
         
         if artifacts.get("proposal") is None:
-            return {
-                "agent": "Proposal",
-                "reason": "Exploration complete, need feature proposal"
-            }
+            if complexity == "low":
+                pass # Skip Proposal
+            else:
+                return {
+                    "agent": "Proposal",
+                    "reason": "Exploration complete, need feature proposal"
+                }
         
         if artifacts.get("architecture") is None:
-            return {
-                "agent": "Architect",
-                "reason": "Proposal complete, need technical architecture design"
-            }
+            if complexity in ["low", "medium"]:
+                pass # Skip Architecture
+            else:
+                return {
+                    "agent": "Architect",
+                    "reason": "Proposal complete, need technical architecture design"
+                }
         
         if artifacts.get("tasks") is None:
-            return {
-                "agent": "TaskPlanner",
-                "reason": "Architecture complete, need task breakdown"
-            }
+            if complexity in ["low", "medium"]:
+                pass # Skip Task Planning
+            else:
+                return {
+                    "agent": "TaskPlanner",
+                    "reason": "Architecture complete, need task breakdown"
+                }
         
         if artifacts.get("implementation") is None:
             return {
                 "agent": "Developer",
-                "reason": "Tasks defined, need implementation"
+                "reason": "Ready for implementation"
             }
         
         if artifacts.get("tests") is None:
@@ -66,10 +90,13 @@ class CEOAgent(BaseAgent):
             }
         
         if artifacts.get("verification") is None:
-            return {
-                "agent": "Auditor",
-                "reason": "Tests complete, need final verification"
-            }
+            if complexity in ["low", "medium"]:
+                pass # Skip Auditor
+            else:
+                return {
+                    "agent": "Auditor",
+                    "reason": "Tests complete, need final verification"
+                }
         
         if artifacts.get("archive") is None:
             return {

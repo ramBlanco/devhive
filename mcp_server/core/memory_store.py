@@ -114,7 +114,7 @@ class MemoryStore:
     
     def __init__(self, project_name: str):
         self.project_name = project_name
-        self.db_path = Path(f"./{project_name}/memory.db")
+        self.db_path = Path(f"./.devhive/memory.db")
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.vectorizer = TFIDFVectorizer()
         self._init_db()

@@ -65,6 +65,8 @@ def devhive_start_pipeline(project_name: str, requirements: str) -> str:
     
     This is the RECOMMENDED way to use DevHive. It returns Task launch instructions
     that OpenCode can use to execute each agent in isolated context.
+
+    Remember always read AGENTS.md if exists.
     
     Args:
         project_name: Project identifier (will be created if doesn't exist)

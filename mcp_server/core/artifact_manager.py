@@ -7,7 +7,7 @@ import logging
 class ArtifactManager:
     def __init__(self, project_name: str):
         self.project_name = project_name
-        self.artifacts_dir = f"./{project_name}/artifacts"
+        self.artifacts_dir = f"./.devhive/artifacts"
         # Ensure dir exists (via filesystem util)
         try:
             get_safe_path(self.artifacts_dir).mkdir(parents=True, exist_ok=True)

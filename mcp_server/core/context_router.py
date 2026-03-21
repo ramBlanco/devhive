@@ -81,10 +81,20 @@ class ContextRouter:
             arch_id = state["artifacts"].get("architecture")
             tasks_id = state["artifacts"].get("tasks")
             
+            # Dynamic Workflow: If architecture/tasks are missing (skipped), provide earlier artifacts
             if arch_id:
                 base_context["architecture_artifact"] = self.artifact_manager.load_artifact(arch_id)
             if tasks_id:
                 base_context["tasks_artifact"] = self.artifact_manager.load_artifact(tasks_id)
+            
+            # Fallback for simpler workflows
+            if not arch_id or not tasks_id:
+                explorer_id = state["artifacts"].get("exploration")
+                proposal_id = state["artifacts"].get("proposal")
+                if explorer_id:
+                     base_context["exploration_artifact"] = self.artifact_manager.load_artifact(explorer_id)
+                if proposal_id:
+                     base_context["proposal_artifact"] = self.artifact_manager.load_artifact(proposal_id)
             
             # Should also know existing files
             base_context["existing_files"] = state.get("files_generated", [])
@@ -97,8 +107,17 @@ class ContextRouter:
             
             if impl_id:
                 base_context["implementation_artifact"] = self.artifact_manager.load_artifact(impl_id)
+            
             if arch_id:
-                base_context["architecture_artifact"] = self.artifact_manager.load_summary(arch_id) # Just summary for QA context check? Or full? Full is safer for logic checks.
+                base_context["architecture_artifact"] = self.artifact_manager.load_summary(arch_id)
+            else:
+                # Fallback: Use exploration/proposal as spec for tests
+                explorer_id = state["artifacts"].get("exploration")
+                proposal_id = state["artifacts"].get("proposal")
+                if explorer_id:
+                     base_context["exploration_artifact"] = self.artifact_manager.load_artifact(explorer_id)
+                if proposal_id:
+                     base_context["proposal_artifact"] = self.artifact_manager.load_artifact(proposal_id)
             
             base_context["files_to_test"] = state.get("files_generated", [])
             return base_context

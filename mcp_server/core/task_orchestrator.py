@@ -64,6 +64,12 @@ class TaskOrchestrator:
         next_decision = self.ceo.get_next_agent_deterministic()
         next_agent = next_decision.get("agent")
         
+        if not next_agent:
+             return {
+                "status": "error",
+                "message": "CEO agent failed to determine next step"
+             }
+
         # Check if pipeline is complete
         if next_agent == "Complete":
             return {
