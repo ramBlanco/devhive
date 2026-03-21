@@ -21,6 +21,14 @@ class ContextRouter:
         self.artifact_manager = artifact_manager
         self.memory_store = memory_store
 
+    def get_project_guidelines(self) -> str:
+        """Retrieves project guidelines if available."""
+        try:
+            from mcp_server.utils.filesystem import read_file
+            return read_file("GUIDELINES.md")
+        except Exception:
+            return "Guidelines not found."
+
     def get_context(self, agent_role: str) -> Dict[str, Any]:
         state = self.state_manager.get_state()
         
@@ -47,6 +55,7 @@ class ContextRouter:
         elif agent_role == "Explorer":
             # Explorer needs user request (assumed passed separately or stored)
             # and potentially existing constraints/dependencies if iterating
+            base_context["project_guidelines"] = self.get_project_guidelines()
             return base_context
 
         elif agent_role == "Proposal":
@@ -98,6 +107,7 @@ class ContextRouter:
             
             # Should also know existing files
             base_context["existing_files"] = state.get("files_generated", [])
+            base_context["project_guidelines"] = self.get_project_guidelines()
             return base_context
 
         elif agent_role == "QA":

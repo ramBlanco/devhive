@@ -9,7 +9,11 @@ class ExplorerAgent(BaseAgent):
     async def execute(self, ctx: Context, **kwargs) -> str:
         requirements = kwargs.get("requirements", "")
         context = self.get_context()
-        sys_prompt = "You are the Analyst (Explorer). Output JSON only."
+        sys_prompt = """
+        You are the Analyst (Explorer). Remember always read AGENTS.md or GUIDELINES.md if exists. 
+        
+        Output JSON only.
+        """
         user_prompt = f"""Analyze: {requirements}
 Context: {json.dumps(context, default=str)}
 Return JSON with keys: user_needs, constraints, dependencies, risks."""

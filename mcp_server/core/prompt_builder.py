@@ -57,6 +57,10 @@ Note: You have access to the devhive_search_memory tool if you need to find spec
 Context: {json.dumps(context, default=str)}
 
 Your task is to perform initial analysis and exploration.
+Check 'project_guidelines' in the context. 
+- If it says "Guidelines not found.", you MUST establish the technology stack.
+  - If the stack is clear from the request (e.g. "Use Python/Flask"), generate a Markdown string for 'new_guidelines_content'.
+  - If the stack is unclear, providing a question in 'clarification_question'.
 
 Return JSON with the following keys:
 - user_needs: String describing what users need from this feature
@@ -68,6 +72,8 @@ Return JSON with the following keys:
   - "medium": Moderate changes, needs proposal but no complex architecture.
   - "high": Complex changes, needs full architecture and planning.
 - suggested_workflow: "fast_track" (low), "standard" (medium), or "comprehensive" (high)
+- new_guidelines_content: (Optional) Markdown string with best practices if guidelines were missing.
+- clarification_question: (Optional) Question to ask user if tech stack is unclear.
 
 Example format:
 {{
@@ -177,10 +183,11 @@ Example format:
         system_prompt = f"You are the Developer. Output JSON only.{PromptBuilder.MEMORY_SEARCH_NOTE}"
         
         user_prompt = f"""Implement the feature based on available specifications (requirements, proposal, or architecture).
-        
+
 Context: {json.dumps(context, default=str)}
 
 Your task is to create the implementation plan and code.
+CRITICAL: Check 'project_guidelines' in the context. You MUST strictly adhere to these best practices, naming conventions, and technology choices.
 
 Return JSON with the following keys:
 - implementation_strategy: High-level strategy for implementation

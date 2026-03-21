@@ -190,6 +190,10 @@ class TaskOrchestrator:
             agent = QAAgent(self.project_name)
             file_paths = agent.write_test_files(data)
             self.state_manager.add_files(file_paths)
+        elif agent_name == "Explorer":
+            if "new_guidelines_content" in data:
+                from mcp_server.utils.filesystem import write_file
+                write_file("GUIDELINES.md", data["new_guidelines_content"])
         
         # Generate executive summary
         summary = self._generate_summary(agent_name, data)
@@ -287,10 +291,20 @@ class TaskOrchestrator:
         """Generate summary for Explorer agent."""
         constraints_count = len(data.get("constraints", []))
         deps_count = len(data.get("dependencies", []))
-        return (
+        base_summary = (
             f"Analyzed requirements and identified {constraints_count} constraints "
             f"and {deps_count} dependencies. Key user need: {data.get('user_needs', 'N/A')[:80]}..."
         )
+        
+        extra_info = []
+        if "new_guidelines_content" in data:
+            extra_info.append("Created GUIDELINES.md with best practices.")
+        if "clarification_question" in data:
+            extra_info.append(f"QUESTION FOR USER: {data['clarification_question']}")
+            
+        if extra_info:
+            return f"{base_summary} {' '.join(extra_info)}"
+        return base_summary
     
     def _summarize_proposal(self, data: Dict[str, Any]) -> str:
         """Generate summary for Proposal agent."""

@@ -13,9 +13,20 @@ class ResponseValidator:
         Validate Explorer agent response.
         
         Expected keys: user_needs, constraints, dependencies, risks, complexity, suggested_workflow
+        Optional keys: new_guidelines_content, clarification_question
         """
         required_keys = ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow"]
-        return ResponseValidator._validate_keys(response, required_keys, "Explorer")
+        is_valid, error = ResponseValidator._validate_keys(response, required_keys, "Explorer")
+        if not is_valid:
+            return is_valid, error
+            
+        if "new_guidelines_content" in response and not isinstance(response["new_guidelines_content"], str):
+             return False, "Explorer: 'new_guidelines_content' must be a string"
+             
+        if "clarification_question" in response and not isinstance(response["clarification_question"], str):
+             return False, "Explorer: 'clarification_question' must be a string"
+             
+        return True, ""
 
     @staticmethod
     def validate_proposal(response: Dict[str, Any]) -> Tuple[bool, str]:
@@ -163,7 +174,7 @@ class ResponseValidator:
             List of expected key names
         """
         key_mapping = {
-            "Explorer": ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow"],
+            "Explorer": ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow", "new_guidelines_content", "clarification_question"],
             "Proposal": ["feature_description", "user_value", "acceptance_criteria", "scope"],
             "Architect": ["architecture_pattern", "components", "data_models", "apis"],
             "TaskPlanner": ["epics", "tasks", "estimated_complexity"],
