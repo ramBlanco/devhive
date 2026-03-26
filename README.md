@@ -47,7 +47,7 @@ graph LR
 
 ### Core Components
 
-*   **`mcp_server`**: The main Python package containing the server logic.
+*   **`devhive`**: The main Python package containing the server logic.
 *   **`TaskOrchestrator`**: Manages the transition between agents and validates outputs.
 *   **`MemoryStore`**: A local vector-lite store (TF-IDF) for semantic search over project history.
 *   **`ProjectStateManager`**: Persists project status to `project_state.json`.
@@ -100,7 +100,7 @@ If you prefer manual setup:
   "mcp": {
     "devhive": {
       "type": "local",
-      "command": ["python3", "-m", "mcp_server.server"],
+      "command": ["python3", "-m", "devhive.server"],
       "enabled": true,
       "env": { "PYTHONUNBUFFERED": "1" }
     }
@@ -171,7 +171,7 @@ devhive/
 ├── AGENTS.md              # Documentation for agent roles
 ├── pyproject.toml         # Python project configuration
 ├── setup.py               # Legacy setup support
-├── mcp_server/            # Source code
+├── devhive/            # Source code
 │   ├── agents/            # Logic for individual agents (Explorer, Developer, etc.)
 │   ├── core/              # Core infrastructure (LLM, Memory, State)
 │   ├── utils/             # Filesystem and validation utilities
@@ -198,9 +198,9 @@ pytest
 
 ### Adding a New Agent
 
-1.  Create a new class in `mcp_server/agents/` inheriting from `BaseAgent`.
-2.  Define the agent's specific validation logic in `mcp_server/utils/validation.py`.
-3.  Register the agent in `mcp_server/server.py` and `mcp_server/core/task_orchestrator.py`.
+1.  Create a new class in `devhive/agents/` inheriting from `BaseAgent`.
+2.  Define the agent's specific validation logic in `devhive/utils/validation.py`.
+3.  Register the agent in `devhive/server.py` and `devhive/core/task_orchestrator.py`.
 4.  Update `DEVHIVE_AGENT.md` to include the new role in the pipeline instructions.
 
 ---

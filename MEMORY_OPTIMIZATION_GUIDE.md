@@ -207,7 +207,7 @@ context = {
 
 ## 🔍 Implementation Details
 
-### MemoryStore Class (`mcp_server/core/memory_store.py`)
+### MemoryStore Class (`devhive/core/memory_store.py`)
 
 **Components:**
 1. **SQLite Database:** Embedded database (no setup required)
@@ -363,7 +363,7 @@ Example agent usage:
 cd /home/ramses/Documents/proyects/devhive
 
 python3 -c "
-from mcp_server.core.memory_store import MemoryStore
+from devhive.core.memory_store import MemoryStore
 
 # Create memory store
 ms = MemoryStore('test_rag')
@@ -443,7 +443,7 @@ results = memory_store.search_memory(
 ## 📁 File Structure
 
 ```
-mcp_server/
+devhive/
 ├── core/
 │   ├── memory_store.py         # ← NEW: SQLite + TF-IDF implementation
 │   ├── task_orchestrator.py    # MODIFIED: Auto-stores memories

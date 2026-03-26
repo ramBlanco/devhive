@@ -5,11 +5,11 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 from mcp.server.fastmcp import FastMCP, Context
-from mcp_server.core.project_state_manager import ProjectStateManager
-from mcp_server.core.prompt_builder import PromptBuilder
-from mcp_server.utils.validation import ResponseValidator
-from mcp_server.utils.filesystem import list_files, read_file, write_file
-from mcp_server.agents import (
+from devhive.core.project_state_manager import ProjectStateManager
+from devhive.core.prompt_builder import PromptBuilder
+from devhive.utils.validation import ResponseValidator
+from devhive.utils.filesystem import list_files, read_file, write_file
+from devhive.agents import (
     ExplorerAgent, ProposalAgent, ArchitectAgent, TaskAgent,
     DeveloperAgent, QAAgent, AuditorAgent, ArchivistAgent, CEOAgent
 )
@@ -89,7 +89,7 @@ def devhive_start_pipeline(project_name: str, requirements: str) -> str:
         # Then call devhive_submit_result() with the Task output
     """
     try:
-        from mcp_server.core.task_orchestrator import TaskOrchestrator
+        from devhive.core.task_orchestrator import TaskOrchestrator
         
         # Initialize orchestrator (creates project if needed)
         orchestrator = TaskOrchestrator(project_name)
@@ -139,7 +139,7 @@ def devhive_submit_result(project_name: str, agent_name: str, llm_response: str)
             # Use next_task with OpenCode Task tool
     """
     try:
-        from mcp_server.core.task_orchestrator import TaskOrchestrator
+        from devhive.core.task_orchestrator import TaskOrchestrator
         
         orchestrator = TaskOrchestrator(project_name)
         
@@ -679,7 +679,7 @@ def devhive_search_memory(project_name: str, query: str, top_k: int = 5, chunk_t
         devhive_search_memory("csv_export", "database schema design", top_k=3, chunk_types=["artifact"])
     """
     try:
-        from mcp_server.core.memory_store import MemoryStore
+        from devhive.core.memory_store import MemoryStore
         
         memory_store = MemoryStore(project_name)
         results = memory_store.search_memory(
@@ -721,7 +721,7 @@ def devhive_get_memory_stats(project_name: str) -> str:
         JSON with memory statistics (total chunks, chunks by type, database size)
     """
     try:
-        from mcp_server.core.memory_store import MemoryStore
+        from devhive.core.memory_store import MemoryStore
         
         memory_store = MemoryStore(project_name)
         stats = memory_store.get_statistics()
@@ -752,7 +752,7 @@ def devhive_get_recent_memories(project_name: str, limit: int = 10, chunk_types:
         JSON with recent memory chunks
     """
     try:
-        from mcp_server.core.memory_store import MemoryStore
+        from devhive.core.memory_store import MemoryStore
         
         memory_store = MemoryStore(project_name)
         memories = memory_store.get_recent_memories(

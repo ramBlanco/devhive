@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional, List
-from mcp_server.core.project_state_manager import ProjectStateManager
-from mcp_server.core.artifact_manager import ArtifactManager
+from devhive.core.project_state_manager import ProjectStateManager
+from devhive.core.artifact_manager import ArtifactManager
 
 class ContextRouter:
     """
@@ -24,7 +24,7 @@ class ContextRouter:
     def get_project_guidelines(self) -> str:
         """Retrieves project guidelines if available."""
         try:
-            from mcp_server.utils.filesystem import read_file
+            from devhive.utils.filesystem import read_file
             return read_file("GUIDELINES.md")
         except Exception:
             return "Guidelines not found."

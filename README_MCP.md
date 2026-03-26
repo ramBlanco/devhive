@@ -15,7 +15,7 @@ pip install mcp
 You can run the MCP server using Python directly. From the project root directory:
 
 ```bash
-python3 -m mcp_server.server
+python3 -m devhive.server
 ```
 
 This starts the server on stdio, ready to be connected to an MCP client like Claude Desktop, Cursor, or OpenCode.
@@ -31,7 +31,7 @@ To use this with Claude Desktop, add the following to your `claude_desktop_confi
       "command": "python3",
       "args": [
         "-m",
-        "mcp_server.server"
+        "devhive.server"
       ],
       "cwd": "/absolute/path/to/devhive",
       "env": {
@@ -212,7 +212,7 @@ Ensure you're using the correct `execute_*` tool and that the LLM response inclu
 
 ```
 devhive/
-├── mcp_server/
+├── devhive/
 │   ├── agents/          # 8 specialized agents
 │   ├── core/            # Core infrastructure
 │   │   ├── llm.py              # LLM wrapper (requires sampling)

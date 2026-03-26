@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Any
 from mcp.server.fastmcp import Context
-from mcp_server.agents.base_agent import BaseAgent
+from devhive.agents.base_agent import BaseAgent
 
 class DeveloperAgent(BaseAgent):
     role = "Developer"
@@ -9,7 +9,7 @@ class DeveloperAgent(BaseAgent):
     def write_files(self, data: Dict[str, Any]) -> list[str]:
         """Write implementation files to disk. Returns list of file paths."""
         files = data.get("files", [])
-        from mcp_server.utils.filesystem import write_file
+        from devhive.utils.filesystem import write_file
         file_paths = []
         for f in files:
             if isinstance(f, dict) and "path" in f and "content" in f:

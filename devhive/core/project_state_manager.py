@@ -7,7 +7,7 @@ class ProjectStateManager:
         self.state_file = f"./.devhive/project_state.json"
         
         try:
-            from mcp_server.utils.filesystem import get_safe_path, read_file
+            from devhive.utils.filesystem import get_safe_path, read_file
             try:
                 # Attempt to read first
                 self.read_state()
@@ -19,11 +19,11 @@ class ProjectStateManager:
             pass # Handle init error?
 
     def read_state(self):
-        from mcp_server.utils.filesystem import read_file
+        from devhive.utils.filesystem import read_file
         return json.loads(read_file(self.state_file))
 
     def write_state(self, state):
-        from mcp_server.utils.filesystem import write_file
+        from devhive.utils.filesystem import write_file
         write_file(self.state_file, json.dumps(state, indent=2))
         
     def get_state(self):

@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Any
 from mcp.server.fastmcp import Context
-from mcp_server.agents.base_agent import BaseAgent
+from devhive.agents.base_agent import BaseAgent
 
 class ArchivistAgent(BaseAgent):
     role = "Archivist"

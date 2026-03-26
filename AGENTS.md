@@ -13,7 +13,7 @@ DevHive is a Python-based MCP (Model Context Protocol) server that orchestrates 
 ### Running the Server
 ```bash
 # Run MCP server (main entry point)
-python3 -m mcp_server.server
+python3 -m devhive.server
 
 # Run standalone demo
 python3 main.py
@@ -56,8 +56,8 @@ from pathlib import Path
 from mcp.server.fastmcp import Context
 
 # 3. Local imports
-from mcp_server.agents.base_agent import BaseAgent
-from mcp_server.core.llm import LLM
+from devhive.agents.base_agent import BaseAgent
+from devhive.core.llm import LLM
 ```
 
 ### Naming Conventions
@@ -116,7 +116,7 @@ except Exception as e:
 ### File Operations
 ALWAYS use filesystem utilities (never direct os/pathlib):
 ```python
-from mcp_server.utils.filesystem import write_file, read_file, list_files
+from devhive.utils.filesystem import write_file, read_file, list_files
 
 # Write file (creates parent directories automatically)
 write_file("path/to/file.py", content)
@@ -143,7 +143,7 @@ logger.error(f"Operation failed: {error_message}")
 ### Agent Structure
 All agents inherit from `BaseAgent`:
 ```python
-from mcp_server.agents.base_agent import BaseAgent
+from devhive.agents.base_agent import BaseAgent
 
 class MyAgent(BaseAgent):
     role = "MyRole"  # Used for context routing
@@ -165,7 +165,7 @@ class MyAgent(BaseAgent):
 ### LLM Calls
 Use the centralized LLM wrapper:
 ```python
-from mcp_server.core.llm import LLM
+from devhive.core.llm import LLM
 
 # Generate text
 text = await LLM.generate(ctx, system_prompt, user_prompt, max_tokens=2000)
@@ -177,7 +177,7 @@ data = await LLM.generate_json(ctx, system_prompt, user_prompt)
 ### State Management
 Access project state through managers:
 ```python
-from mcp_server.core.project_state_manager import ProjectStateManager
+from devhive.core.project_state_manager import ProjectStateManager
 
 state_manager = ProjectStateManager(project_name)
 state = state_manager.get_state()  # Returns dict with stage, artifacts, files
@@ -271,7 +271,7 @@ If validation fails, fix the LLM response and retry the same `execute_*` call.
 ## Testing New Features
 
 When adding features:
-1. Test MCP server: `python3 -m mcp_server.server` (connects via stdio)
+1. Test MCP server: `python3 -m devhive.server` (connects via stdio)
 2. Verify logging output in stderr
 3. Test manual workflow: `get_next_step() -> execute_*() -> repeat`
 4. Check generated files in workspace directory
@@ -281,5 +281,5 @@ When adding features:
 
 - MCP SDK: https://github.com/modelcontextprotocol/python-sdk
 - FastMCP: Part of MCP SDK, provides simplified server creation
-- Project structure: `mcp_server/agents/` (agents), `mcp_server/core/` (infrastructure)
+- Project structure: `devhive/agents/` (agents), `devhive/core/` (infrastructure)
 - Manual Workflow: See WORKFLOW_MANUAL.md for detailed guide

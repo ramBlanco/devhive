@@ -1,6 +1,6 @@
 [project]
 name = "devhive"
-version = "0.1.10"
+version = "0.1.11"
 description = "DevHive MCP Server"
 requires-python = ">=3.10"
 
@@ -9,8 +9,8 @@ dependencies = [
 ]
 
 [project.scripts]
-devhive_mcp = "mcp_server.server:main"
-devhive = "mcp_server.cli:main"
+devhive_mcp = "devhive.server:main"
+devhive = "devhive.cli:main"
 
 [build-system]
 requires = ["setuptools"]
@@ -18,4 +18,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["mcp_server*", "DEVHIVE_AGENT"]
+include = ["devhive*", "DEVHIVE_AGENT"]

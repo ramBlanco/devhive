@@ -3,10 +3,10 @@ import logging
 from typing import Dict, Any, Optional
 from mcp.types import SamplingMessage, TextContent
 from mcp.server.fastmcp import Context
-from mcp_server.core.project_state_manager import ProjectStateManager
-from mcp_server.core.artifact_manager import ArtifactManager
-from mcp_server.core.context_router import ContextRouter
-from mcp_server.core.llm import LLM
+from devhive.core.project_state_manager import ProjectStateManager
+from devhive.core.artifact_manager import ArtifactManager
+from devhive.core.context_router import ContextRouter
+from devhive.core.llm import LLM
 
 logger = logging.getLogger(__name__)
 

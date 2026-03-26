@@ -7,13 +7,13 @@ import json
 import logging
 from typing import Dict, Any, Optional
 
-from mcp_server.core.project_state_manager import ProjectStateManager
-from mcp_server.core.artifact_manager import ArtifactManager
-from mcp_server.core.prompt_builder import PromptBuilder
-from mcp_server.core.context_router import ContextRouter
-from mcp_server.core.memory_store import MemoryStore
-from mcp_server.agents.ceo import CEOAgent
-from mcp_server.utils.validation import ResponseValidator
+from devhive.core.project_state_manager import ProjectStateManager
+from devhive.core.artifact_manager import ArtifactManager
+from devhive.core.prompt_builder import PromptBuilder
+from devhive.core.context_router import ContextRouter
+from devhive.core.memory_store import MemoryStore
+from devhive.agents.ceo import CEOAgent
+from devhive.utils.validation import ResponseValidator
 
 logger = logging.getLogger(__name__)
 
@@ -181,18 +181,18 @@ class TaskOrchestrator:
         
         # Handle side effects for agents that write files
         if agent_name == "Developer":
-            from mcp_server.agents.developer import DeveloperAgent
+            from devhive.agents.developer import DeveloperAgent
             agent = DeveloperAgent(self.project_name)
             file_paths = agent.write_files(data)
             self.state_manager.add_files(file_paths)
         elif agent_name == "QA":
-            from mcp_server.agents.qa import QAAgent
+            from devhive.agents.qa import QAAgent
             agent = QAAgent(self.project_name)
             file_paths = agent.write_test_files(data)
             self.state_manager.add_files(file_paths)
         elif agent_name == "Explorer":
             if "new_guidelines_content" in data:
-                from mcp_server.utils.filesystem import write_file
+                from devhive.utils.filesystem import write_file
                 write_file("GUIDELINES.md", data["new_guidelines_content"])
         
         # Generate executive summary

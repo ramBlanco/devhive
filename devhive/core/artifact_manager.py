@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional, List
-from mcp_server.utils.filesystem import write_file, read_file, get_safe_path
+from devhive.utils.filesystem import write_file, read_file, get_safe_path
 import logging
 
 class ArtifactManager:

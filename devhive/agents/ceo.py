@@ -1,8 +1,8 @@
 import json
 from typing import Dict, Any
 from mcp.server.fastmcp import Context
-from mcp_server.agents.base_agent import BaseAgent
-from mcp_server.core.project_state_manager import ProjectStateManager
+from devhive.agents.base_agent import BaseAgent
+from devhive.core.project_state_manager import ProjectStateManager
 
 class CEOAgent(BaseAgent):
     role = "CEO"

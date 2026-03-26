@@ -97,7 +97,7 @@ def configure():
         dest_dir = Path.home() / ".config" / "opencode" / "agents"
         dest_file = dest_dir / "DevHive.md"
         _copy_agent_file(source_to_use, dest_dir, dest_file, "OpenCode Agent")
-        _configure_mcp_server()
+        _configure_devhive()
 
     # 4. Configure Copilot
     if choice in ["copilot", "both"]:
@@ -184,7 +184,7 @@ def _configure_vscode_copilot(agent_file_path):
     except Exception as e:
         print(f"[-] Failed to update VS Code settings: {e}")
 
-def _configure_mcp_server():
+def _configure_devhive():
     print("\n--- Configuring MCP Server Connection ---")
     confirm = input("Do you want to add the DevHive MCP server to OpenCode config? [y/N]: ").lower().strip()
     if confirm != 'y':
@@ -243,15 +243,12 @@ def _configure_mcp_server():
                 python_cmd = str(venv_python)
         
         # Construct command
-        server_command = [python_cmd, "-m", "mcp_server.server"]
+        server_command = [python_cmd, "-m", "devhive.server"]
         
         config["mcp"]["devhive"] = {
             "type": "local",
             "command": server_command,
-            "enabled": True,
-            "env": {
-                "PYTHONUNBUFFERED": "1"
-            }
+            "enabled": True
         }
         
         with open(config_path, "w") as f:
@@ -266,10 +263,14 @@ def _configure_mcp_server():
 def start():
     """Starts the MCP server."""
     try:
-        from mcp_server.server import main as server_main
+        from devhive.server import main as server_main
         print(f"[*] Starting DevHive MCP Server (PID {os.getpid()})...")
         server_main()
     except ImportError:
+        import traceback
+        print("[-] DETALLE DEL ERROR REAL:")
+        traceback.print_exc() # <-- MOSTRAR QUÉ FALLÓ, LÍNEA POR LÍNEA
+
         # Check for venv and restart
         venv_python = Path.cwd() / ".venv" / "bin" / "python"
         if venv_python.exists() and sys.executable != str(venv_python):
@@ -278,7 +279,7 @@ def start():
             # Re-execute using venv python
             os.execv(str(venv_python), [str(venv_python)] + sys.argv)
         else:
-            print("[-] Error: Could not import mcp_server.server")
+            print("[-] Error: Could not import devhive.server")
             print("[-] Ensure dependencies are installed or activate your virtual environment.")
             return
     except KeyboardInterrupt:
