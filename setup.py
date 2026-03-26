@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="devhive-mcp",
-    version="0.1.7",
+    version="0.1.8",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
@@ -11,6 +11,6 @@ setup(
         ],
     },
     install_requires=[
-        # "mcp",  # Assumed to be available in the environment
+        "mcp",
     ],
 )
