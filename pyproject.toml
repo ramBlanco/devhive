@@ -5,7 +5,7 @@ description = "DevHive MCP Server"
 requires-python = ">=3.10"
 
 dependencies = [
-    # "mcp"
+    "mcp"
 ]
 
 [project.scripts]
