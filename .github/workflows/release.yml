@@ -77,21 +77,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
+      - name: Set project version
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          sed -i 's/version=".*"/version="${{ needs.details.outputs.new_version }}"/' setup.py
+          sed -i 's/version = ".*"/version = "${{ needs.details.outputs.new_version }}"/' pyproject.toml
 
-      - name: Set project version with Poetry
+      - name: Install build tools and dependencies
         run: |
-          poetry version ${{ needs.details.outputs.new_version }}
-
-      - name: Install dependencies
-        run: poetry install --sync --no-interaction
+          python -m pip install --upgrade pip build
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Build source and wheel distribution
         run: |
-          poetry build
+          python -m build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
