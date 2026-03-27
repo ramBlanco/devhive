@@ -61,17 +61,31 @@ graph LR
 *   Python 3.10 or higher
 *   `pip`
 
-### Install from Source
+### Option 1: Global Installation via PyPI (Recommended)
 
-Clone the repository and install the package in editable mode:
+To install DevHive globally on your system so you can use it in any project:
+
+```bash
+python3 -m pip install -U devhive
+```
+
+*Tip: Using `python3 -m pip` (or `python3.11 -m pip`) guarantees the package installs correctly for your specific Python version, avoiding common `$PATH` issues.*
+
+### Option 2: Local / Development Environment (From Source)
+
+If you want to contribute, modify DevHive, or test local changes:
 
 ```bash
 git clone https://github.com/yourusername/devhive.git
 cd devhive
+
+# Create and activate a virtual environment (optional but recommended)
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+
+# Install in editable mode
 pip install -e .
 ```
-
-This installs the `devhive` CLI tool globally in your environment.
 
 ---
 
@@ -81,9 +95,12 @@ DevHive includes a smart configuration tool that sets up your environment automa
 
 ### 1. Run the Setup Wizard
 
+If you installed DevHive globally:
 ```bash
 devhive configure
 ```
+
+*(If the `devhive` command is not found due to `$PATH` issues, use: `python3 -m devhive.cli configure`)*
 
 The wizard will ask:
 *   **Client Selection:** OpenCode, GitHub Copilot (VS Code), or both.
@@ -100,7 +117,7 @@ If you prefer manual setup:
   "mcp": {
     "devhive": {
       "type": "local",
-      "command": ["python3", "-m", "devhive.server"],
+      "command": ["python3", "-m", "devhive.cli", "start"],
       "enabled": true,
       "env": { "PYTHONUNBUFFERED": "1" }
     }
@@ -128,8 +145,9 @@ To start the MCP server locally (useful for debugging or manual connection):
 ```bash
 devhive start
 ```
+*(Alternative if `$PATH` is not set: `python3 -m devhive.cli start`)*
 
-*Note: If configured correctly in OpenCode, the server starts automatically in the background.*
+*Note: If configured correctly in OpenCode, the server starts automatically in the background when you use the agent.*
 
 ### Workflow with AI Clients
 
