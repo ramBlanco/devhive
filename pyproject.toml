@@ -1,6 +1,6 @@
 [project]
 name = "devhive"
-version = "0.1.12"
+version = "0.1.13"
 description = "DevHive MCP Server"
 requires-python = ">=3.10"
 
@@ -15,6 +15,9 @@ devhive = "devhive.cli:main"
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+devhive = ["skills/*.md", "skills/*/*.md"]
 
 [tool.setuptools.packages.find]
 where = ["."]

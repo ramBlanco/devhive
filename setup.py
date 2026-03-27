@@ -2,8 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="devhive",
-    version="0.1.12",
+    version="0.1.13",
     packages=find_packages(),
+    package_data={
+        "devhive": ["skills/*.md", "skills/*/*.md"],
+    },
+    include_package_data=True,
     entry_points={
         "console_scripts": [
             "devhive_mcp=devhive.server:main",

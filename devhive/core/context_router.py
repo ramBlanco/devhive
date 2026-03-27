@@ -29,6 +29,31 @@ class ContextRouter:
         except Exception:
             return "Guidelines not found."
 
+    def get_agent_skills(self, agent_role: str) -> Dict[str, str]:
+        """Retrieves global skills and role-specific skills from the package."""
+        skills = {}
+        try:
+            from pathlib import Path
+            import logging
+            skills_dir = Path(__file__).parent.parent / "skills"
+            
+            paths_to_check = [skills_dir / "global"]
+            if agent_role:
+                paths_to_check.append(skills_dir / agent_role.lower())
+                
+            for path in paths_to_check:
+                if path.exists() and path.is_dir():
+                    for md_file in path.glob("*.md"):
+                        try:
+                            with open(md_file, "r", encoding="utf-8") as f:
+                                skills[f"{path.name}/{md_file.stem}"] = f.read()
+                        except Exception as inner_e:
+                            logging.warning(f"Failed to read skill file {md_file}: {inner_e}")
+        except Exception as e:
+            import logging
+            logging.warning(f"Failed to load agent skills: {e}")
+        return skills
+
     def get_context(self, agent_role: str) -> Dict[str, Any]:
         state = self.state_manager.get_state()
         
@@ -37,6 +62,7 @@ class ContextRouter:
             "project_name": state["project"],
             "current_stage": state["stage"],
             "files_generated_summary": len(state.get("files_generated", [])),
+            "agent_skills": self.get_agent_skills(agent_role),
         }
 
         # Role-specific context loading
