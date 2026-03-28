@@ -37,8 +37,6 @@ Note: You have access to the devhive_search_memory tool if you need to find spec
             return PromptBuilder._build_task_planner_prompts(context)
         elif agent_role == "Developer":
             return PromptBuilder._build_developer_prompts(context)
-        elif agent_role == "TaskDistributor":
-            return PromptBuilder._build_task_distributor_prompts(context)
         elif agent_role == "QA":
             return PromptBuilder._build_qa_prompts(context)
         elif agent_role == "Auditor":
@@ -211,30 +209,6 @@ Example format:
 }}
 
 IMPORTANT: Include actual code in the 'files' array. Each file should have 'path' and 'content' keys."""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
-
-    @staticmethod
-    def _build_task_distributor_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are the Task Distributor. You coordinate parallel development. Output JSON only."
-        
-        user_prompt = f"""Coordinate parallel development of tasks.
-
-Context: {json.dumps(context, default=str)}
-
-Your role is to execute the TaskDistributor workflow, which:
-1. Loads tasks from TaskPlanner
-2. Analyzes dependencies
-3. Spawns developer agents for parallel execution
-4. Aggregates results
-
-This is handled automatically by the TaskDistributor agent.
-No LLM response needed - this is a programmatic workflow.
-
-Return empty JSON: {{}}"""
         
         return {
             "system_prompt": system_prompt,

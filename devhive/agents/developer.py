@@ -34,6 +34,10 @@ Return JSON with keys: implementation_strategy, file_structure, pseudocode, file
     
     def generate_summary(self, data: Dict[str, Any]) -> str:
         """Generate executive summary for Developer agent."""
+        if data.get("iterative_execution"):
+            tasks_count = data.get("total_tasks_completed", 0)
+            return f"Completed iterative implementation of {tasks_count} tasks."
+            
         files_count = len(data.get("files", []))
         strategy = data.get("implementation_strategy", "N/A")
         # Truncate if too long

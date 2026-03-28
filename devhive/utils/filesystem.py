@@ -1,3 +1,4 @@
+from typing import List
 import os
 from pathlib import Path
 from typing import Optional
@@ -57,7 +58,7 @@ def read_file(path: str) -> str:
     with open(full_path, "r", encoding="utf-8") as f:
         return f.read()
 
-def list_files(path: str = ".") -> list[str]:
+def list_files(path: str = ".") -> List[str]:
     """Lists files in a directory recursively."""
     full_path = get_safe_path(path)
     if not full_path.exists():

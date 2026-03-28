@@ -17,7 +17,7 @@ class CEOAgent(BaseAgent):
         2. Proposal
         3. Architect
         4. TaskPlanner
-        5. Developer
+        5. Developer (Iterative)
         6. QA
         7. Auditor
         8. Archivist
@@ -78,29 +78,29 @@ class CEOAgent(BaseAgent):
                 }
         
         if artifacts.get("implementation") is None:
-            # NEW: Check if parallel development is needed
-            tasks_artifact_id = artifacts.get("tasks")
-            if tasks_artifact_id:
-                try:
-                    tasks_data = self.artifact_manager.load_artifact(tasks_artifact_id)
-                    task_list = tasks_data.get("tasks", [])
-                    task_count = len(task_list)
-                    
-                    if task_count > 1:
-                        # Multiple tasks - use parallel development
-                        return {
-                            "agent": "TaskDistributor",
-                            "reason": f"Need to distribute {task_count} tasks across parallel developers"
-                        }
-                except Exception as e:
-                    # Fallback to single developer if can't load tasks
-                    pass
+            # Iterative Developer Workflow
+            dev_progress = state.get("developer_progress", {})
+            pending_tasks = dev_progress.get("pending_tasks", [])
+            completed_tasks = dev_progress.get("completed_tasks", [])
             
-            # Single task or fallback - use standard developer
-            return {
-                "agent": "Developer",
-                "reason": "Ready for implementation"
-            }
+            # If we haven't initialized developer progress yet, we need to route to developer
+            # Or if there are still pending tasks to complete
+            if not dev_progress or pending_tasks:
+                task_count = len(pending_tasks) if pending_tasks else "tasks"
+                return {
+                    "agent": "Developer",
+                    "reason": f"Need to execute {task_count} pending tasks sequentially"
+                }
+            elif not pending_tasks and completed_tasks:
+                # This state shouldn't normally happen (orchestrator should create implementation artifact)
+                # But just in case, if pending is empty but completed is not, we're done with implementation
+                pass
+            else:
+                # No tasks found at all? Fallback to single run
+                return {
+                    "agent": "Developer",
+                    "reason": "Ready for implementation"
+                }
         
         if artifacts.get("tests") is None:
             return {

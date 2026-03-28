@@ -112,24 +112,74 @@ class ContextRouter:
             return base_context
 
         elif agent_role == "Developer": # Implementation
-            # Developer needs Architecture + Tasks
-            arch_id = state["artifacts"].get("architecture")
+            # Iterative Developer Context (Optimized)
+            from devhive.core.context_optimizer import ContextOptimizer
+            optimizer = ContextOptimizer()
+            
+            # Setup base artifacts
+            raw_context = {}
+            for key in ["exploration", "proposal", "architecture"]:
+                art_id = state["artifacts"].get(key)
+                if art_id:
+                    try:
+                        raw_context[key] = self.artifact_manager.load_artifact(art_id)
+                    except:
+                        pass
+            
+            # Check for tasks
             tasks_id = state["artifacts"].get("tasks")
-            
-            # Dynamic Workflow: If architecture/tasks are missing (skipped), provide earlier artifacts
-            if arch_id:
-                base_context["architecture_artifact"] = self.artifact_manager.load_artifact(arch_id)
             if tasks_id:
-                base_context["tasks_artifact"] = self.artifact_manager.load_artifact(tasks_id)
-            
-            # Fallback for simpler workflows
-            if not arch_id or not tasks_id:
-                explorer_id = state["artifacts"].get("exploration")
-                proposal_id = state["artifacts"].get("proposal")
-                if explorer_id:
-                     base_context["exploration_artifact"] = self.artifact_manager.load_artifact(explorer_id)
-                if proposal_id:
-                     base_context["proposal_artifact"] = self.artifact_manager.load_artifact(proposal_id)
+                tasks_data = self.artifact_manager.load_artifact(tasks_id)
+                all_tasks = tasks_data.get("tasks", [])
+                
+                # Check developer progress
+                dev_progress = state.get("developer_progress", {})
+                pending = dev_progress.get("pending_tasks", [])
+                
+                # Initialize progress if needed
+                if not dev_progress:
+                    # Get tasks with IDs, default to index if missing
+                    for i, t in enumerate(all_tasks):
+                        if "id" not in t:
+                            t["id"] = f"task_{i+1}"
+                    pending = all_tasks
+                    dev_progress = {
+                        "pending_tasks": pending,
+                        "completed_tasks": [],
+                        "task_results": {}
+                    }
+                    state["developer_progress"] = dev_progress
+                    self.state_manager.update_state(state)
+                
+                if pending:
+                    # Extract the FIRST pending task for this iteration
+                    current_task = pending[0]
+                    base_context["current_task"] = current_task
+                    
+                    # Optimize context using ContextOptimizer
+                    task_files = current_task.get("files_involved", [])
+                    optimized = optimizer.optimize_full_context(raw_context, task_files)
+                    
+                    # Add dependency outputs if any
+                    task_results = dev_progress.get("task_results", {})
+                    depends_on = current_task.get("depends_on", [])
+                    dep_outputs = {
+                        tid: task_results[tid] for tid in depends_on if tid in task_results
+                    }
+                    if dep_outputs:
+                        # Filter to only keep file paths, not content
+                        optimized["dependency_outputs"] = optimizer.filter_dependency_outputs(dep_outputs)
+                    
+                    base_context.update(optimized)
+                    
+            # Fallback for simpler workflows without tasks
+            if "current_task" not in base_context and not tasks_id:
+                 explorer_id = state["artifacts"].get("exploration")
+                 proposal_id = state["artifacts"].get("proposal")
+                 if explorer_id:
+                      base_context["exploration_artifact"] = self.artifact_manager.load_artifact(explorer_id)
+                 if proposal_id:
+                      base_context["proposal_artifact"] = self.artifact_manager.load_artifact(proposal_id)
             
             # Should also know existing files
             base_context["existing_files"] = state.get("files_generated", [])

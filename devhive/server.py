@@ -33,9 +33,6 @@ def get_agent(role: str, project_name: str):
     if role == "Architect": return ArchitectAgent(project_name)
     if role == "TaskPlanner": return TaskAgent(project_name)
     if role == "Developer": return DeveloperAgent(project_name)
-    if role == "TaskDistributor": 
-        from devhive.core.task_distributor import TaskDistributor
-        return TaskDistributor(project_name)
     if role == "QA": return QAAgent(project_name)
     if role == "Auditor": return AuditorAgent(project_name)
     if role == "Archivist": return ArchivistAgent(project_name)
@@ -616,87 +613,6 @@ def execute_archivist(project_name: str) -> str:
         
     except Exception as e:
         logger.error(f"Archivist execution failed: {e}")
-        return json.dumps({
-            "status": "error",
-            "message": str(e)
-        }, indent=2)
-
-# ============================================================================
-# PARALLEL DEVELOPMENT TOOLS
-# ============================================================================
-
-@mcp.tool()
-async def execute_task_distributor(project_name: str, ctx: Context) -> str:
-    """
-    Execute TaskDistributor agent for parallel development.
-    
-    The TaskDistributor coordinates multiple developer agents working on
-    independent tasks in parallel.
-    
-    Args:
-        project_name: Project identifier
-        ctx: MCP context (required for LLM calls)
-    
-    Returns:
-        JSON with status, artifact_id, files written, and message
-    """
-    try:
-        from devhive.core.task_distributor import TaskDistributor
-        
-        distributor = TaskDistributor(project_name)
-        
-        # Execute parallel development workflow
-        artifact_id = await distributor.execute(ctx)
-        
-        # Load artifact to get file count
-        from devhive.core.artifact_manager import ArtifactManager
-        artifact_manager = ArtifactManager(project_name)
-        data = artifact_manager.load_artifact(artifact_id)
-        
-        files_count = len(data.get("files", []))
-        total_tasks = data.get("total_tasks", 0)
-        
-        return json.dumps({
-            "status": "success",
-            "agent": "TaskDistributor",
-            "artifact_id": artifact_id,
-            "total_tasks": total_tasks,
-            "files_written": files_count,
-            "message": f"TaskDistributor completed {total_tasks} tasks. Wrote {files_count} files. Call get_next_step() to continue."
-        }, indent=2)
-        
-    except Exception as e:
-        logger.error(f"TaskDistributor execution failed: {e}", exc_info=True)
-        return json.dumps({
-            "status": "error",
-            "message": str(e),
-            "agent": "TaskDistributor"
-        }, indent=2)
-
-@mcp.tool()
-def get_developer_status(project_name: str) -> str:
-    """
-    Get status of parallel developer agents.
-    
-    Args:
-        project_name: Project identifier
-    
-    Returns:
-        JSON with status of all developers and task queue
-    """
-    try:
-        from devhive.core.task_distributor import TaskDistributor
-        
-        distributor = TaskDistributor(project_name)
-        status = distributor.get_status()
-        
-        return json.dumps({
-            "status": "success",
-            "developer_status": status
-        }, indent=2)
-        
-    except Exception as e:
-        logger.error(f"Failed to get developer status: {e}")
         return json.dumps({
             "status": "error",
             "message": str(e)

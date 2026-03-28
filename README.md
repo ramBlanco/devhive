@@ -21,7 +21,6 @@ Designed to integrate seamlessly with **OpenCode** and **GitHub Copilot**, DevHi
     6.  **QA:** Generates and executes test suites.
     7.  **Auditor:** Verifies consistency against architecture and requirements.
     8.  **Archivist:** Finalizes and archives the project state.
-*   **Parallel Development:** Automatically distributes independent tasks across multiple developer agents for faster execution.
 *   **Smart Dependency Management:** Hybrid approach combining explicit and inferred task dependencies.
 *   **Persistent State Management:** Tracks project progress, artifacts, and file generation across sessions.
 *   **Context Optimization (RAG):** Built-in memory system using TF-IDF to retrieve relevant context from previous steps, reducing token usage and hallucination.
@@ -182,8 +181,6 @@ The server exposes the following MCP tools to the AI agent:
 | `devhive_get_memory_stats` | Returns usage statistics for the project memory. |
 | `list_workspace_files` | Lists files in the current working directory. |
 | `read_workspace_file` | Reads content of a specific file. |
-
-**New in Parallel Development:** See [PARALLEL_DEVELOPMENT.md](PARALLEL_DEVELOPMENT.md) for detailed guide on the parallel developer system.
 
 ---
 

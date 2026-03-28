@@ -175,38 +175,73 @@ class TaskOrchestrator:
                 "message": f"Failed to save artifact: {str(e)}"
             }
         
-        # Update state
+        # Iterative Developer Logic
         artifact_key = self._get_artifact_key(agent_name)
-        self.state_manager.update_artifact(artifact_key, artifact_id)
+        is_final_developer_iteration = False
         
-        # Handle side effects for agents that write files
         if agent_name == "Developer":
+            state = self.state_manager.get_state()
+            dev_progress = state.get("developer_progress", {})
+            
             from devhive.agents.developer import DeveloperAgent
             agent = DeveloperAgent(self.project_name)
             file_paths = agent.write_files(data)
             self.state_manager.add_files(file_paths)
-        elif agent_name == "TaskDistributor":
-            # TaskDistributor aggregates files from multiple developers
-            # Extract all files from the aggregated result
-            files = data.get("files", [])
-            if files:
-                from devhive.utils.filesystem import write_file
-                file_paths = []
-                for f in files:
-                    if isinstance(f, dict) and "path" in f and "content" in f:
-                        write_file(f["path"], f["content"])
-                        file_paths.append(f["path"])
+            
+            # If we are using the task-based iterative workflow
+            if dev_progress and "pending_tasks" in dev_progress and dev_progress["pending_tasks"]:
+                current_task = dev_progress["pending_tasks"].pop(0)
+                task_id = current_task.get("id", "unknown")
+                
+                # Save this task's results
+                dev_progress["task_results"][task_id] = {
+                    "files": [f.get("path") for f in data.get("files", []) if isinstance(f, dict) and "path" in f],
+                    "implementation_strategy": data.get("implementation_strategy", "")
+                }
+                dev_progress["completed_tasks"].append(current_task)
+                
+                # Update state with progress
+                state["developer_progress"] = dev_progress
+                self.state_manager.update_state(state)
+                
+                # Are we done with all tasks?
+                if not dev_progress["pending_tasks"]:
+                    is_final_developer_iteration = True
+                    logger.info("All developer tasks completed. Creating final implementation artifact.")
+                    
+                    # Create aggregated artifact
+                    all_strategies = [f"Task {tid}: {res['implementation_strategy']}" 
+                                     for tid, res in dev_progress["task_results"].items()]
+                    
+                    aggregated_data = {
+                        "implementation_strategy": "\n\n".join(all_strategies),
+                        "total_tasks_completed": len(dev_progress["completed_tasks"]),
+                        "iterative_execution": True
+                    }
+                    final_artifact_id = self.artifact_manager.save_artifact(artifact_key, aggregated_data)
+                    self.state_manager.update_artifact(artifact_key, final_artifact_id)
+                else:
+                    # Not done, skip updating the implementation artifact key
+                    # so CEO routes back to Developer next time
+                    logger.info(f"Task {task_id} completed. {len(dev_progress['pending_tasks'])} tasks remaining.")
+            else:
+                # Fallback for simple (no tasks) workflow
+                self.state_manager.update_artifact(artifact_key, artifact_id)
+                is_final_developer_iteration = True
+        else:
+            # Normal artifact update for other agents
+            self.state_manager.update_artifact(artifact_key, artifact_id)
+            
+            # Handle side effects for other agents
+            if agent_name == "QA":
+                from devhive.agents.qa import QAAgent
+                agent = QAAgent(self.project_name)
+                file_paths = agent.write_test_files(data)
                 self.state_manager.add_files(file_paths)
-                logger.info(f"TaskDistributor wrote {len(file_paths)} files from parallel developers")
-        elif agent_name == "QA":
-            from devhive.agents.qa import QAAgent
-            agent = QAAgent(self.project_name)
-            file_paths = agent.write_test_files(data)
-            self.state_manager.add_files(file_paths)
-        elif agent_name == "Explorer":
-            if "new_guidelines_content" in data:
-                from devhive.utils.filesystem import write_file
-                write_file("GUIDELINES.md", data["new_guidelines_content"])
+            elif agent_name == "Explorer":
+                if "new_guidelines_content" in data:
+                    from devhive.utils.filesystem import write_file
+                    write_file("GUIDELINES.md", data["new_guidelines_content"])
         
         # Generate executive summary
         summary = self._generate_summary(agent_name, data)
@@ -249,7 +284,6 @@ class TaskOrchestrator:
             "Architect": ResponseValidator.validate_architect,
             "TaskPlanner": ResponseValidator.validate_task_planner,
             "Developer": ResponseValidator.validate_developer,
-            "TaskDistributor": ResponseValidator.validate_developer,  # Uses same schema as Developer
             "QA": ResponseValidator.validate_qa,
             "Auditor": ResponseValidator.validate_auditor,
             "Archivist": lambda x: (True, "")  # Archivist doesn't need validation
@@ -274,7 +308,6 @@ class TaskOrchestrator:
             "Architect": "architecture",
             "TaskPlanner": "tasks",
             "Developer": "implementation",
-            "TaskDistributor": "implementation",  # Aggregates into same key as Developer
             "QA": "tests",
             "Auditor": "verification",
             "Archivist": "archive"
@@ -294,7 +327,6 @@ class TaskOrchestrator:
             "Architect": self._summarize_architect,
             "TaskPlanner": self._summarize_task_planner,
             "Developer": self._summarize_developer,
-            "TaskDistributor": self._summarize_task_distributor,
             "QA": self._summarize_qa,
             "Auditor": self._summarize_auditor,
             "Archivist": self._summarize_archivist
@@ -351,22 +383,15 @@ class TaskOrchestrator:
     
     def _summarize_developer(self, data: Dict[str, Any]) -> str:
         """Generate summary for Developer agent."""
+        # Check if this is an aggregated summary or single task
+        if data.get("iterative_execution"):
+            tasks_count = data.get("total_tasks_completed", 0)
+            return f"Completed iterative implementation of {tasks_count} tasks."
+            
         files_count = len(data.get("files", []))
         return (
-            f"Implemented {files_count} files using strategy: "
+            f"Implemented {files_count} files for current task using strategy: "
             f"{data.get('implementation_strategy', 'N/A')[:80]}..."
-        )
-    
-    def _summarize_task_distributor(self, data: Dict[str, Any]) -> str:
-        """Generate summary for TaskDistributor agent."""
-        total_tasks = data.get("total_tasks", 0)
-        files_count = len(data.get("files", []))
-        task_results = data.get("task_results", {})
-        
-        return (
-            f"Distributed {total_tasks} tasks across parallel developers. "
-            f"Implemented {files_count} total files. "
-            f"Tasks completed: {', '.join(task_results.keys())}"
         )
     
     def _summarize_qa(self, data: Dict[str, Any]) -> str:
