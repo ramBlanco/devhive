@@ -16,11 +16,13 @@ Designed to integrate seamlessly with **OpenCode** and **GitHub Copilot**, DevHi
     1.  **Explorer:** Analyzes requirements and feasibility.
     2.  **Proposal:** Creates detailed feature proposals.
     3.  **Architect:** Designs technical architecture and system diagrams.
-    4.  **TaskPlanner:** Breaks down work into actionable developer tasks.
-    5.  **Developer:** Implements code and writes files.
+    4.  **TaskPlanner:** Breaks down work into actionable developer tasks with dependencies.
+    5.  **Developer (Parallel):** Implements code with up to 5 parallel developer agents working on independent tasks.
     6.  **QA:** Generates and executes test suites.
     7.  **Auditor:** Verifies consistency against architecture and requirements.
     8.  **Archivist:** Finalizes and archives the project state.
+*   **Parallel Development:** Automatically distributes independent tasks across multiple developer agents for faster execution.
+*   **Smart Dependency Management:** Hybrid approach combining explicit and inferred task dependencies.
 *   **Persistent State Management:** Tracks project progress, artifacts, and file generation across sessions.
 *   **Context Optimization (RAG):** Built-in memory system using TF-IDF to retrieve relevant context from previous steps, reducing token usage and hallucination.
 *   **Cross-Platform CLI:** Easy-to-use command-line interface for configuration and server management.
@@ -173,11 +175,15 @@ The server exposes the following MCP tools to the AI agent:
 |------|-------------|
 | `devhive_start_pipeline` | Initializes a project and retrieves the first task (Explorer). |
 | `devhive_submit_result` | Submits work from the current agent, saves artifacts, and retrieves the next task. |
+| `execute_task_distributor` | Executes parallel development workflow (auto-invoked for multi-task projects). |
+| `get_developer_status` | Gets status of parallel developer agents and task queue. |
 | `devhive_search_memory` | Searches project history/context using semantic query. |
 | `devhive_get_recent_memories` | Retrieves the most recent interactions for context refreshment. |
 | `devhive_get_memory_stats` | Returns usage statistics for the project memory. |
 | `list_workspace_files` | Lists files in the current working directory. |
 | `read_workspace_file` | Reads content of a specific file. |
+
+**New in Parallel Development:** See [PARALLEL_DEVELOPMENT.md](PARALLEL_DEVELOPMENT.md) for detailed guide on the parallel developer system.
 
 ---
 

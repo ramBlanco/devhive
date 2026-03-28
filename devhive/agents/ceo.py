@@ -78,6 +78,25 @@ class CEOAgent(BaseAgent):
                 }
         
         if artifacts.get("implementation") is None:
+            # NEW: Check if parallel development is needed
+            tasks_artifact_id = artifacts.get("tasks")
+            if tasks_artifact_id:
+                try:
+                    tasks_data = self.artifact_manager.load_artifact(tasks_artifact_id)
+                    task_list = tasks_data.get("tasks", [])
+                    task_count = len(task_list)
+                    
+                    if task_count > 1:
+                        # Multiple tasks - use parallel development
+                        return {
+                            "agent": "TaskDistributor",
+                            "reason": f"Need to distribute {task_count} tasks across parallel developers"
+                        }
+                except Exception as e:
+                    # Fallback to single developer if can't load tasks
+                    pass
+            
+            # Single task or fallback - use standard developer
             return {
                 "agent": "Developer",
                 "reason": "Ready for implementation"

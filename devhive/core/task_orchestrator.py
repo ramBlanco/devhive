@@ -185,6 +185,19 @@ class TaskOrchestrator:
             agent = DeveloperAgent(self.project_name)
             file_paths = agent.write_files(data)
             self.state_manager.add_files(file_paths)
+        elif agent_name == "TaskDistributor":
+            # TaskDistributor aggregates files from multiple developers
+            # Extract all files from the aggregated result
+            files = data.get("files", [])
+            if files:
+                from devhive.utils.filesystem import write_file
+                file_paths = []
+                for f in files:
+                    if isinstance(f, dict) and "path" in f and "content" in f:
+                        write_file(f["path"], f["content"])
+                        file_paths.append(f["path"])
+                self.state_manager.add_files(file_paths)
+                logger.info(f"TaskDistributor wrote {len(file_paths)} files from parallel developers")
         elif agent_name == "QA":
             from devhive.agents.qa import QAAgent
             agent = QAAgent(self.project_name)
@@ -236,6 +249,7 @@ class TaskOrchestrator:
             "Architect": ResponseValidator.validate_architect,
             "TaskPlanner": ResponseValidator.validate_task_planner,
             "Developer": ResponseValidator.validate_developer,
+            "TaskDistributor": ResponseValidator.validate_developer,  # Uses same schema as Developer
             "QA": ResponseValidator.validate_qa,
             "Auditor": ResponseValidator.validate_auditor,
             "Archivist": lambda x: (True, "")  # Archivist doesn't need validation
@@ -260,6 +274,7 @@ class TaskOrchestrator:
             "Architect": "architecture",
             "TaskPlanner": "tasks",
             "Developer": "implementation",
+            "TaskDistributor": "implementation",  # Aggregates into same key as Developer
             "QA": "tests",
             "Auditor": "verification",
             "Archivist": "archive"
@@ -279,6 +294,7 @@ class TaskOrchestrator:
             "Architect": self._summarize_architect,
             "TaskPlanner": self._summarize_task_planner,
             "Developer": self._summarize_developer,
+            "TaskDistributor": self._summarize_task_distributor,
             "QA": self._summarize_qa,
             "Auditor": self._summarize_auditor,
             "Archivist": self._summarize_archivist
@@ -339,6 +355,18 @@ class TaskOrchestrator:
         return (
             f"Implemented {files_count} files using strategy: "
             f"{data.get('implementation_strategy', 'N/A')[:80]}..."
+        )
+    
+    def _summarize_task_distributor(self, data: Dict[str, Any]) -> str:
+        """Generate summary for TaskDistributor agent."""
+        total_tasks = data.get("total_tasks", 0)
+        files_count = len(data.get("files", []))
+        task_results = data.get("task_results", {})
+        
+        return (
+            f"Distributed {total_tasks} tasks across parallel developers. "
+            f"Implemented {files_count} total files. "
+            f"Tasks completed: {', '.join(task_results.keys())}"
         )
     
     def _summarize_qa(self, data: Dict[str, Any]) -> str:

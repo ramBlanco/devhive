@@ -54,6 +54,7 @@ class ResponseValidator:
         Validate TaskPlanner agent response.
         
         Expected keys: epics, tasks, estimated_complexity
+        Tasks should now include: id, name, description, depends_on, files_involved
         """
         required_keys = ["epics", "tasks", "estimated_complexity"]
         is_valid, error_msg = ResponseValidator._validate_keys(response, required_keys, "TaskPlanner")
@@ -64,6 +65,22 @@ class ResponseValidator:
         # Additional validation: tasks should be a list
         if not isinstance(response.get("tasks"), list):
             return False, "TaskPlanner: 'tasks' must be a list of task objects"
+        
+        # Validate task structure for parallel development
+        tasks = response.get("tasks", [])
+        for idx, task in enumerate(tasks):
+            if not isinstance(task, dict):
+                return False, f"TaskPlanner: Task at index {idx} must be a dict"
+            
+            # Check for required task fields
+            task_required = ["id", "name", "description"]
+            missing_in_task = [key for key in task_required if key not in task]
+            if missing_in_task:
+                return False, f"TaskPlanner: Task at index {idx} missing keys: {', '.join(missing_in_task)}"
+            
+            # depends_on should be a list if present
+            if "depends_on" in task and not isinstance(task["depends_on"], list):
+                return False, f"TaskPlanner: Task '{task.get('id')}' - 'depends_on' must be a list"
         
         return True, ""
 
@@ -177,8 +194,9 @@ class ResponseValidator:
             "Explorer": ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow", "new_guidelines_content", "clarification_question"],
             "Proposal": ["feature_description", "user_value", "acceptance_criteria", "scope"],
             "Architect": ["architecture_pattern", "components", "data_models", "apis"],
-            "TaskPlanner": ["epics", "tasks", "estimated_complexity"],
+            "TaskPlanner": ["epics", "tasks (with id, name, description, depends_on, files_involved)", "estimated_complexity"],
             "Developer": ["implementation_strategy", "file_structure", "files"],
+            "TaskDistributor": ["implementation_strategy", "file_structure", "files", "parallel_execution", "total_tasks"],
             "QA": ["test_strategy", "unit_tests", "validation_plan", "files"],
             "Auditor": ["architecture_consistency", "missing_pieces", "security_risks"],
             "Archivist": []  # No validation needed
