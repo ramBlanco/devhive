@@ -4,7 +4,6 @@ from devhive.agents.proposal import ProposalAgent
 from devhive.agents.architect import ArchitectAgent
 from devhive.agents.task_agent import TaskAgent
 from devhive.agents.developer import DeveloperAgent
-from devhive.agents.parallel_developer import ParallelDeveloperAgent
 from devhive.agents.qa import QAAgent
 from devhive.agents.auditor import AuditorAgent
 from devhive.agents.archivist import ArchivistAgent

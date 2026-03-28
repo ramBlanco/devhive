@@ -95,7 +95,7 @@ def configure():
     # 3. Configure OpenCode
     if choice in ["opencode", "both"]:
         dest_dir = Path.home() / ".config" / "opencode" / "agents"
-        dest_file = dest_dir / "DevHive.md"
+        dest_file = dest_dir / "DevHive0118.md"
         _copy_agent_file(source_to_use, dest_dir, dest_file, "OpenCode Agent")
         _configure_devhive()
 

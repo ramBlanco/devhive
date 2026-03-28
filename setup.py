@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="devhive",
-    version="0.1.17",
+    version="0.1.18",
     packages=find_packages(),
     package_data={
         "devhive": ["skills/*.md", "skills/*/*.md"],
