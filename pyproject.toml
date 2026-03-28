@@ -1,11 +1,12 @@
 [project]
 name = "devhive"
-version = "0.1.14"
+version = "0.1.15"
 description = "DevHive MCP Server"
 requires-python = ">=3.10"
 
 dependencies = [
     "mcp"
+    "tiktoken>=0.5.0"
 ]
 
 [project.scripts]

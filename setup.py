@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="devhive",
-    version="0.1.14",
+    version="0.1.15",
     packages=find_packages(),
     package_data={
         "devhive": ["skills/*.md", "skills/*/*.md"],
@@ -16,5 +16,6 @@ setup(
     },
     install_requires=[
         "mcp",
+        "tiktoken>=0.5.0"
     ],
 )
