@@ -55,7 +55,7 @@ def _parse_json_response(text: str) -> Dict[str, Any]:
         raise ValueError(f"Invalid JSON response: {e}")
 
 # ============================================================================
-# TASK-BASED WORKFLOW TOOLS (Recommended - Uses OpenCode Task Tool)
+# TASK-BASED WORKFLOW TOOLS (Recommended - Use devhive_workflow skill)
 # ============================================================================
 
 @mcp.tool()
@@ -64,7 +64,7 @@ def devhive_start_pipeline(project_name: str, requirements: str) -> str:
     Start a new DevHive pipeline with Task-based execution.
     
     This is the RECOMMENDED way to use DevHive. It returns Task launch instructions
-    that OpenCode can use to execute each agent in isolated context.
+    that OpenCode should execute using the devhive_workflow skill.
 
     Remember always read AGENTS.md if exists.
     
@@ -85,7 +85,7 @@ def devhive_start_pipeline(project_name: str, requirements: str) -> str:
     
     Example:
         result = devhive_start_pipeline("csv_export", "Add CSV export to dashboard")
-        # Use result["system_prompt"] and result["user_prompt"] with OpenCode Task tool
+        # Use result["system_prompt"] and result["user_prompt"] with Task tool (general)
         # Then call devhive_submit_result() with the Task output
     """
     try:
@@ -136,7 +136,7 @@ def devhive_submit_result(project_name: str, agent_name: str, llm_response: str)
         if result["status"] == "success":
             print(result["executive_summary"])
             next_task = result["next_task"]
-            # Use next_task with OpenCode Task tool
+            # Use next_task with Task tool (general)
     """
     try:
         from devhive.core.task_orchestrator import TaskOrchestrator

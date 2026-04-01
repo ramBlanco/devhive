@@ -1,6 +1,6 @@
 """
 Task-based pipeline orchestrator.
-Manages agent sequence and returns Task launch instructions for OpenCode.
+Manages agent sequence and returns Task launch instructions for SDD Skill execution.
 """
 
 import json
@@ -27,7 +27,7 @@ class TaskOrchestrator:
     - Builds prompts using PromptBuilder
     - Validates responses using ResponseValidator
     - Saves artifacts using ArtifactManager
-    - Returns structured envelopes for OpenCode
+    - Returns structured envelopes for Skill execution
     """
     
     def __init__(self, project_name: str):

@@ -1,6 +1,6 @@
 [project]
 name = "devhive"
-version = "0.1.19"
+version = "0.1.20"
 description = "DevHive MCP Server"
 requires-python = ">=3.10"
 

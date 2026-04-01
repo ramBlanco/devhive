@@ -195,9 +195,18 @@ state_manager.add_files(["file1.py", "file2.py"])
 6. **Check for None artifacts** - Context may have `None` for artifacts not yet created
 7. **Log errors before returning** - Use logger.error() for debugging MCP server issues
 
-## Manual Workflow (OpenCode Compatible)
+## Official Workflow (SDD)
 
-**IMPORTANT:** OpenCode does not yet support MCP sampling. Use the manual workflow instead of `build_feature()`.
+The official and most robust way to use DevHive is via the **Skill-Driven Development (SDD)** workflow.
+
+1. **Load the Skill:** Instruct OpenCode to load the orchestrator skill by typing:
+   `/skill load devhive_workflow`
+2. **Start Pipeline:** Simply ask OpenCode to build your feature (e.g. "Build a CSV export feature for my dashboard").
+3. **Autonomous Execution:** OpenCode will autonomously run the entire pipeline (CEO -> Explorer -> Developer -> QA -> etc.) by dynamically spawning subagents (`general`), passing the required contexts, and verifying JSON schemas. 
+
+## Manual Workflow (Legacy)
+
+**IMPORTANT:** OpenCode does not yet support MCP sampling. If you cannot use the `devhive_workflow` skill, you can manually trigger the legacy tools instead.
 
 ### Available MCP Tools
 
