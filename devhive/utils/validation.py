@@ -8,6 +8,28 @@ class ResponseValidator:
     """
 
     @staticmethod
+    def validate_ceo(response: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Validate CEO agent response.
+        
+        Expected keys: workflow_plan, reasoning
+        """
+        required_keys = ["workflow_plan", "reasoning"]
+        is_valid, error = ResponseValidator._validate_keys(response, required_keys, "CEO")
+        if not is_valid:
+            return is_valid, error
+            
+        if not isinstance(response.get("workflow_plan"), list):
+            return False, "CEO: 'workflow_plan' must be a list of agent names"
+            
+        valid_agents = ["Explorer", "Proposal", "Architect", "TaskPlanner", "Developer", "QA", "Auditor", "Archivist"]
+        for agent in response["workflow_plan"]:
+            if agent not in valid_agents:
+                return False, f"CEO: Invalid agent name '{agent}' in workflow_plan. Valid agents are: {', '.join(valid_agents)}"
+                
+        return True, ""
+
+    @staticmethod
     def validate_explorer(response: Dict[str, Any]) -> Tuple[bool, str]:
         """
         Validate Explorer agent response.
@@ -191,6 +213,7 @@ class ResponseValidator:
             List of expected key names
         """
         key_mapping = {
+            "CEO": ["workflow_plan", "reasoning"],
             "Explorer": ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow", "new_guidelines_content", "clarification_question"],
             "Proposal": ["feature_description", "user_value", "acceptance_criteria", "scope"],
             "Architect": ["architecture_pattern", "components", "data_models", "apis"],

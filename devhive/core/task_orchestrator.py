@@ -279,6 +279,7 @@ class TaskOrchestrator:
     def _validate_response(self, agent_name: str, response: Dict[str, Any]) -> tuple[bool, str]:
         """Validate response using appropriate validator method."""
         validators = {
+            "CEO": ResponseValidator.validate_ceo,
             "Explorer": ResponseValidator.validate_explorer,
             "Proposal": ResponseValidator.validate_proposal,
             "Architect": ResponseValidator.validate_architect,
@@ -303,6 +304,7 @@ class TaskOrchestrator:
     def _get_artifact_key(self, agent_name: str) -> str:
         """Map agent name to artifact key used in state."""
         mapping = {
+            "CEO": "workflow_plan",
             "Explorer": "exploration",
             "Proposal": "proposal",
             "Architect": "architecture",
@@ -313,7 +315,7 @@ class TaskOrchestrator:
             "Archivist": "archive"
         }
         return mapping.get(agent_name, agent_name.lower())
-    
+
     def _generate_summary(self, agent_name: str, data: Dict[str, Any]) -> str:
         """
         Generate 1-3 sentence executive summary of agent's work.
@@ -322,6 +324,7 @@ class TaskOrchestrator:
         via their generate_summary() method for more specific summaries.
         """
         summaries = {
+            "CEO": self._summarize_ceo,
             "Explorer": self._summarize_explorer,
             "Proposal": self._summarize_proposal,
             "Architect": self._summarize_architect,
@@ -334,7 +337,12 @@ class TaskOrchestrator:
         
         summarizer = summaries.get(agent_name, lambda x: f"{agent_name} completed successfully.")
         return summarizer(data)
-    
+
+    def _summarize_ceo(self, data: Dict[str, Any]) -> str:
+        """Generate summary for CEO agent."""
+        plan = data.get("workflow_plan", [])
+        return f"Planned workflow with {len(plan)} agents: {' -> '.join(plan)}."
+
     def _summarize_explorer(self, data: Dict[str, Any]) -> str:
         """Generate summary for Explorer agent."""
         constraints_count = len(data.get("constraints", []))

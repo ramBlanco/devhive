@@ -27,7 +27,9 @@ Note: You have access to the devhive_search_memory tool if you need to find spec
             Dictionary with 'system_prompt' and 'user_prompt' keys
         """
         
-        if agent_role == "Explorer":
+        if agent_role == "CEO":
+            return PromptBuilder._build_ceo_prompts(context, **kwargs)
+        elif agent_role == "Explorer":
             return PromptBuilder._build_explorer_prompts(context, **kwargs)
         elif agent_role == "Proposal":
             return PromptBuilder._build_proposal_prompts(context)
@@ -47,43 +49,155 @@ Note: You have access to the devhive_search_memory tool if you need to find spec
             raise ValueError(f"Unknown agent role: {agent_role}")
 
     @staticmethod
+    def _build_ceo_prompts(context: Dict[str, Any], **kwargs) -> Dict[str, str]:
+        requirements = kwargs.get("requirements", "No requirements provided")
+        
+        system_prompt = """
+You are an AI orchestration agent called "CEO".
+
+Your job is to orchestrate an AI software development pipeline by selecting and ordering agents to fulfill a feature request.
+
+Available agents:
+- Explorer
+- Proposal
+- Architect
+- TaskPlanner
+- Developer
+- QA
+- Auditor
+- Archivist
+
+Agent roles:
+
+Explorer
+Analyzes requirements, constraints and dependencies.
+
+Proposal
+Creates a structured feature proposal and acceptance criteria.
+
+Architect
+Designs technical architecture and system structure.
+
+TaskPlanner
+Breaks the feature into development tasks.
+
+Developer
+Implements the feature.
+
+QA
+Creates tests for the implementation.
+
+Auditor
+Reviews architecture, consistency, and security.
+
+Archivist
+Archives the final project state.
+
+Pipeline rules:
+- Explorer should normally run first
+- Developer must run before Archivist
+- Archivist must always be the final step
+- Agents must appear only once
+- The workflow must be logically ordered
+
+Agent selection guidelines:
+
+Proposal
+Use when the feature requires product clarification or acceptance criteria.
+
+Architect
+Use when backend systems, APIs, or architecture are involved.
+
+TaskPlanner
+Use when the implementation requires multiple tasks or moderate complexity.
+
+QA
+Use when code with logic is implemented.
+
+Auditor
+Use when architecture or security should be reviewed.
+
+Simple features may skip Proposal, Architect, TaskPlanner, QA, and Auditor.
+
+Output rules:
+- Return valid JSON only
+- Do not include explanations outside the JSON
+- Follow the schema exactly
+
+Schema:
+{
+  "workflow_plan": string[],
+  "reasoning": string
+}
+"""
+        
+        user_prompt = f"""
+Feature request:
+
+{requirements}
+
+Determine the optimal sequence of agents to execute.
+"""
+        
+        return {
+            "system_prompt": system_prompt,
+            "user_prompt": user_prompt
+        }
+
+    @staticmethod
     def _build_explorer_prompts(context: Dict[str, Any], **kwargs) -> Dict[str, str]:
         requirements = kwargs.get("requirements", "No requirements provided")
         
-        system_prompt = "You are the Analyst (Explorer). Output JSON only."
+        system_prompt = """
+You are an AI software architecture analyst called "Analyst (Explorer)".
+
+Your role is to analyze feature requests and produce structured technical analysis for downstream agents.
+
+Responsibilities:
+- Identify user needs
+- Detect constraints
+- List dependencies
+- Identify risks
+- Estimate complexity
+- Suggest workflow
+
+Context may include project information such as technology guidelines.
+
+Guidelines handling:
+- If project_guidelines says "Guidelines not found.", determine the likely technology stack.
+- If the stack is clear, generate new guidelines.
+- If the stack is unclear, ask a clarification question.
+
+Complexity levels:
+- low: simple changes, minimal architecture
+- medium: moderate implementation work
+- high: architectural changes or major system impact
+
+Output rules:
+- Output valid JSON only
+- Do not include explanations outside JSON
+- Follow the schema strictly
+
+Schema:
+{
+  "user_needs": string,
+  "constraints": string[],
+  "dependencies": string[],
+  "risks": string[],
+  "complexity": "low" | "medium" | "high",
+  "suggested_workflow": "fast_track" | "standard" | "comprehensive",
+  "new_guidelines_content": string | null,
+  "clarification_question": string | null
+}
+"""
         
-        user_prompt = f"""Analyze the following feature request: {requirements}
+        user_prompt = f"""
+Analyze the following feature request: {requirements}
 
 Context: {json.dumps(context, default=str)}
 
-Your task is to perform initial analysis and exploration.
-Check 'project_guidelines' in the context. 
-- If it says "Guidelines not found.", you MUST establish the technology stack.
-  - If the stack is clear from the request (e.g. "Use Python/Flask"), generate a Markdown string for 'new_guidelines_content'.
-  - If the stack is unclear, providing a question in 'clarification_question'.
-
-Return JSON with the following keys:
-- user_needs: String describing what users need from this feature
-- constraints: List of technical or business constraints
-- dependencies: List of external dependencies or requirements
-- risks: List of potential risks or challenges
-- complexity: "low", "medium", or "high". 
-  - "low": Simple changes, no architecture needed.
-  - "medium": Moderate changes, needs proposal but no complex architecture.
-  - "high": Complex changes, needs full architecture and planning.
-- suggested_workflow: "fast_track" (low), "standard" (medium), or "comprehensive" (high)
-- new_guidelines_content: (Optional) Markdown string with best practices if guidelines were missing.
-- clarification_question: (Optional) Question to ask user if tech stack is unclear.
-
-Example format:
-{{
-  "user_needs": "Users need to export data in CSV format for analysis",
-  "constraints": ["Must work with existing authentication", "Limited to 10MB file size"],
-  "dependencies": ["CSV library", "File storage system"],
-  "risks": ["Large datasets may cause performance issues", "Security concerns with file downloads"],
-  "complexity": "medium",
-  "suggested_workflow": "standard"
-}}"""
+Perform the analysis and exploration and return the JSON response.
+"""
         
         return {
             "system_prompt": system_prompt,

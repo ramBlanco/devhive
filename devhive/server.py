@@ -75,7 +75,7 @@ def devhive_start_pipeline(project_name: str, requirements: str) -> str:
     Returns:
         JSON with Task launch instructions:
         - status: "pending" (next task ready) or "complete" (pipeline done)
-        - agent: Next agent to run (Explorer, Proposal, etc.)
+        - agent: Next agent to run (CEO, Explorer, Proposal, etc.)
         - reason: Why this agent needs to run
         - system_prompt: System prompt for the Task
         - user_prompt: User prompt for the Task
@@ -94,7 +94,7 @@ def devhive_start_pipeline(project_name: str, requirements: str) -> str:
         # Initialize orchestrator (creates project if needed)
         orchestrator = TaskOrchestrator(project_name)
         
-        # Get first task (Explorer)
+        # Get first task (CEO)
         task_info = orchestrator.get_next_task(requirements=requirements)
         
         return json.dumps(task_info, indent=2)
@@ -116,7 +116,7 @@ def devhive_submit_result(project_name: str, agent_name: str, llm_response: str)
     
     Args:
         project_name: Project identifier
-        agent_name: Name of agent that produced result (Explorer, Proposal, Architect,
+        agent_name: Name of agent that produced result (CEO, Explorer, Proposal, Architect,
                    TaskPlanner, Developer, QA, Auditor, or Archivist)
         llm_response: Raw LLM response (JSON string, can include markdown code blocks)
     
@@ -182,7 +182,7 @@ def get_next_step(project_name: str) -> str:
     
     Returns:
         JSON string with:
-        - agent: The agent role name (Explorer, Proposal, etc.)
+        - agent: The agent role name (CEO, Explorer, Proposal, etc.)
         - reason: Why this agent needs to run
         - system_prompt: System prompt to send to LLM
         - user_prompt: User prompt to send to LLM  
@@ -211,9 +211,9 @@ def get_next_step(project_name: str) -> str:
         context = agent.get_context()
         
         # Build prompts using PromptBuilder
-        # For Explorer, we need to check if requirements are in kwargs
-        if agent_role == "Explorer":
-            # Requirements should be provided when executing Explorer
+        # For Explorer/CEO, we need to check if requirements are in kwargs
+        if agent_role in ["Explorer", "CEO"]:
+            # Requirements should be provided when executing
             prompts = PromptBuilder.build_prompts(agent_role, context, requirements="[Requirements will be provided when executing]")
         else:
             prompts = PromptBuilder.build_prompts(agent_role, context)
