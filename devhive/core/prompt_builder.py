@@ -8,25 +8,13 @@ class PromptBuilder:
     Extracts prompts from agent logic to enable manual LLM execution.
     """
     
-    # Memory search capability note (for hybrid RAG mode)
+    # Memory search capability note (for active local RAG)
     MEMORY_SEARCH_NOTE = """
 
-Note: You have access to the devhive_search_memory tool if you need to find specific information from previous pipeline stages. Use it to search for details like architecture decisions, requirements, or implementation specifics."""
+CRITICAL: You are encouraged to actively use the `devhive_search_memory` tool to find specific information from previous pipeline stages (e.g. architecture decisions, requirements, implementation details) if the provided context is not enough. You can also use `devhive_get_recent_memories`."""
 
     @staticmethod
     def build_prompts(agent_role: str, context: Dict[str, Any], **kwargs) -> Dict[str, str]:
-        """
-        Build system and user prompts for a given agent.
-        
-        Args:
-            agent_role: Name of the agent (Explorer, Proposal, etc.)
-            context: Context dictionary from ContextRouter
-            **kwargs: Additional parameters (e.g., requirements for Explorer)
-        
-        Returns:
-            Dictionary with 'system_prompt' and 'user_prompt' keys
-        """
-        
         if agent_role == "CEO":
             return PromptBuilder._build_ceo_prompts(context, **kwargs)
         elif agent_role == "Explorer":
@@ -67,32 +55,6 @@ Available agents:
 - Auditor
 - Archivist
 
-Agent roles:
-
-Explorer
-Analyzes requirements, constraints and dependencies.
-
-Proposal
-Creates a structured feature proposal and acceptance criteria.
-
-Architect
-Designs technical architecture and system structure.
-
-TaskPlanner
-Breaks the feature into development tasks.
-
-Developer
-Implements the feature.
-
-QA
-Creates tests for the implementation.
-
-Auditor
-Reviews architecture, consistency, and security.
-
-Archivist
-Archives the final project state.
-
 Pipeline rules:
 - Explorer should normally run first
 - Developer must run before Archivist
@@ -100,34 +62,14 @@ Pipeline rules:
 - Agents must appear only once
 - The workflow must be logically ordered
 
-Agent selection guidelines:
-
-Proposal
-Use when the feature requires product clarification or acceptance criteria.
-
-Architect
-Use when backend systems, APIs, or architecture are involved.
-
-TaskPlanner
-Use when the implementation requires multiple tasks or moderate complexity.
-
-QA
-Use when code with logic is implemented.
-
-Auditor
-Use when architecture or security should be reviewed.
-
-Simple features may skip Proposal, Architect, TaskPlanner, QA, and Auditor.
-
 Output rules:
 - Return valid JSON only
-- Do not include explanations outside the JSON
 - Follow the schema exactly
 
 Schema:
 {
-  "workflow_plan": string[],
-  "reasoning": string
+  "workflow_plan": ["Explorer", ...],
+  "reasoning": "string"
 }
 """
         
@@ -148,47 +90,30 @@ Determine the optimal sequence of agents to execute.
     def _build_explorer_prompts(context: Dict[str, Any], **kwargs) -> Dict[str, str]:
         requirements = kwargs.get("requirements", "No requirements provided")
         
-        system_prompt = """
+        system_prompt = f"""
 You are an AI software architecture analyst called "Analyst (Explorer)".
-
-Your role is to analyze feature requests and produce structured technical analysis for downstream agents.
-
-Responsibilities:
-- Identify user needs
-- Detect constraints
-- List dependencies
-- Identify risks
-- Estimate complexity
-- Suggest workflow
-
-Context may include project information such as technology guidelines.
-
-Guidelines handling:
-- If project_guidelines says "Guidelines not found.", determine the likely technology stack.
-- If the stack is clear, generate new guidelines.
-- If the stack is unclear, ask a clarification question.
-
-Complexity levels:
-- low: simple changes, minimal architecture
-- medium: moderate implementation work
-- high: architectural changes or major system impact
+Your role is to explore the codebase and requirements, producing a structured technical analysis.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
 Output rules:
-- Output valid JSON only
-- Do not include explanations outside JSON
-- Follow the schema strictly
+- Output valid JSON only with the EXACT envelope structure below.
+- Do not include explanations outside JSON.
 
-Schema:
-{
-  "user_needs": string,
-  "constraints": string[],
-  "dependencies": string[],
-  "risks": string[],
-  "complexity": "low" | "medium" | "high",
-  "suggested_workflow": "fast_track" | "standard" | "comprehensive",
-  "new_guidelines_content": string | null,
-  "clarification_question": string | null
-}
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": ["string"],
+  "phase_data": {{
+    "user_needs": "string",
+    "constraints": ["string"],
+    "dependencies": ["string"],
+    "complexity": "low" | "medium" | "high",
+    "suggested_workflow": "fast_track" | "standard" | "comprehensive",
+    "new_guidelines_content": "string" | null,
+    "clarification_question": "string" | null
+  }}
+}}
 """
         
         user_prompt = f"""
@@ -196,206 +121,235 @@ Analyze the following feature request: {requirements}
 
 Context: {json.dumps(context, default=str)}
 
-Perform the analysis and exploration and return the JSON response.
+WHAT TO DO (PLAYBOOK):
+1. Understand the Request: Is it a feature, bug fix, or refactor?
+2. Investigate Context: Identify potential dependencies or guidelines. Ask clarification if needed.
+3. Analyze Complexity: Estimate as low, medium, or high.
+4. Prepare Envelope: Return your findings in the strict JSON envelope.
 """
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_proposal_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are the Product Manager. Output JSON only."
-        
-        user_prompt = f"""Create a feature proposal based on the exploration phase.
+        system_prompt = f"""
+You are the Product Manager.
+Your role is to create a formal feature proposal based on exploration.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
+Output rules:
+- Output valid JSON only with the EXACT envelope structure below.
+
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": ["string"],
+  "phase_data": {{
+    "feature_description": "string",
+    "user_value": "string",
+    "acceptance_criteria": ["string"],
+    "scope": "string"
+  }}
+}}
+"""
+        user_prompt = f"""
+Create a feature proposal based on the exploration phase.
 Context: {json.dumps(context, default=str)}
 
-Your task is to define the feature proposal with clear acceptance criteria.
-
-Return JSON with the following keys:
-- feature_description: Detailed description of the feature
-- user_value: The value this feature provides to users
-- acceptance_criteria: List of criteria that must be met
-- scope: What is in and out of scope
-
-Example format:
-{{
-  "feature_description": "Add CSV export functionality to analytics dashboard",
-  "user_value": "Users can download and analyze data in Excel/spreadsheet tools",
-  "acceptance_criteria": ["Export button visible on dashboard", "CSV file downloads successfully", "All visible data included in export"],
-  "scope": "In scope: Basic CSV export. Out of scope: Excel formatting, scheduled exports"
-}}"""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+WHAT TO DO (PLAYBOOK):
+1. Review Context: Read the exploration analysis.
+2. Define Value: State why the user needs this.
+3. Define Criteria: List 3-5 clear acceptance criteria.
+4. Define Scope: Clearly mark what is IN and OUT of scope.
+5. Prepare Envelope: Return your findings in the strict JSON envelope.
+"""
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_architect_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are the Tech Lead. Output JSON only."
-        
-        user_prompt = f"""Design the architecture for the feature.
+        system_prompt = f"""
+You are the Tech Lead (Architect).
+Your role is to design the technical architecture for the feature.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
+Output rules:
+- Output valid JSON only with the EXACT envelope structure below.
+
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": ["string"],
+  "phase_data": {{
+    "architecture_pattern": "string",
+    "components": ["string"],
+    "data_models": ["string"],
+    "apis": ["string"]
+  }}
+}}
+"""
+        user_prompt = f"""
+Design the architecture for the feature.
 Context: {json.dumps(context, default=str)}
 
-Your task is to create a technical architecture design.
-
-Return JSON with the following keys:
-- architecture_pattern: The architectural pattern to use (e.g., MVC, microservices)
-- components: List of components/modules needed
-- data_models: List of data models or database schemas
-- apis: List of APIs or interfaces needed
-
-Example format:
-{{
-  "architecture_pattern": "MVC with service layer",
-  "components": ["ExportController", "CSVGeneratorService", "DataFetcherService"],
-  "data_models": ["ExportJob", "ExportHistory"],
-  "apis": ["POST /api/export/csv", "GET /api/export/status/:id"]
-}}"""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+WHAT TO DO (PLAYBOOK):
+1. Review Context: Read proposal and exploration phases.
+2. System Design: Decide on the architecture pattern.
+3. Component Breakdown: Identify new components or services.
+4. Interface Design: Design data models and APIs.
+5. Prepare Envelope: Return your findings in the strict JSON envelope.
+"""
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_task_planner_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are the Scrum Master. Output JSON only."
-        
-        user_prompt = f"""Break down the feature into development tasks.
+        system_prompt = f"""
+You are the Scrum Master (TaskPlanner).
+Your role is to break down the architecture into actionable development tasks.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
+Output rules:
+- Output valid JSON only with the EXACT envelope structure below.
+
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": ["string"],
+  "phase_data": {{
+    "epics": ["string"],
+    "tasks": [
+      {{ "name": "string", "description": "string" }}
+    ],
+    "estimated_complexity": "low" | "medium" | "high"
+  }}
+}}
+"""
+        user_prompt = f"""
+Break down the feature into development tasks.
 Context: {json.dumps(context, default=str)}
 
-Your task is to create a task breakdown with estimates.
-
-Return JSON with the following keys:
-- epics: List of high-level epics
-- tasks: List of task objects with name and description
-- estimated_complexity: Overall complexity estimate (low/medium/high)
-
-Example format:
-{{
-  "epics": ["Backend CSV generation", "Frontend export UI", "Testing"],
-  "tasks": [
-    {{"name": "Create CSVGeneratorService", "description": "Service to convert data to CSV format"}},
-    {{"name": "Add export button to dashboard", "description": "UI component for triggering export"}}
-  ],
-  "estimated_complexity": "medium"
-}}"""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+WHAT TO DO (PLAYBOOK):
+1. Review Context: Understand the architecture and acceptance criteria.
+2. Define Epics: Create high-level buckets.
+3. Extract Tasks: Write specific, actionable tasks for the developer.
+4. Prepare Envelope: Return your findings in the strict JSON envelope.
+"""
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_developer_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = f"You are the Developer. Output JSON only.{PromptBuilder.MEMORY_SEARCH_NOTE}"
-        
-        user_prompt = f"""Implement the feature based on available specifications (requirements, proposal, or architecture).
+        system_prompt = f"""
+You are the Developer.
+Your role is to write the implementation code based on the specifications.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
+Output rules:
+- Output valid JSON only with the EXACT envelope structure below.
+
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": ["list of written file paths"],
+  "phase_data": {{
+    "implementation_strategy": "string",
+    "file_structure": ["string"],
+    "pseudocode": "string",
+    "files": [
+      {{ "path": "string", "content": "string" }}
+    ]
+  }}
+}}
+"""
+        user_prompt = f"""
+Implement the feature.
 Context: {json.dumps(context, default=str)}
 
-Your task is to create the implementation plan and code.
-CRITICAL: Check 'project_guidelines' in the context. You MUST strictly adhere to these best practices, naming conventions, and technology choices.
-
-Return JSON with the following keys:
-- implementation_strategy: High-level strategy for implementation
-- file_structure: List of files that will be created/modified
-- pseudocode: Brief pseudocode or implementation notes
-- files: List of file objects with 'path' and 'content' keys
-
-Example format:
-{{
-  "implementation_strategy": "Create service layer for CSV generation, add controller endpoint, add UI button",
-  "file_structure": ["src/services/csv_generator.py", "src/controllers/export_controller.py"],
-  "pseudocode": "1. Fetch data from database\\n2. Convert to CSV format\\n3. Return file response",
-  "files": [
-    {{
-      "path": "src/services/csv_generator.py",
-      "content": "class CSVGenerator:\\n    def generate(self, data):\\n        # Implementation here\\n        pass"
-    }}
-  ]
-}}
-
-IMPORTANT: Include actual code in the 'files' array. Each file should have 'path' and 'content' keys."""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+WHAT TO DO (PLAYBOOK):
+1. Review Plan: Read the tasks, architecture, and proposal.
+2. Adhere to Guidelines: Check 'project_guidelines'.
+3. Formulate Strategy: Decide how you'll write the code.
+4. Write Code: Include ACTUAL code in the 'files' array.
+5. Prepare Envelope: Return your findings in the strict JSON envelope.
+"""
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_qa_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = f"You are QA. Output JSON only.{PromptBuilder.MEMORY_SEARCH_NOTE}"
-        
-        user_prompt = f"""Generate tests for the implementation.
+        system_prompt = f"""
+You are QA.
+Your role is to write test cases and validate the implementation.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
+Output rules:
+- Output valid JSON only with the EXACT envelope structure below.
+
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": ["list of written test file paths"],
+  "phase_data": {{
+    "test_strategy": "string",
+    "unit_tests": ["string"],
+    "validation_plan": "string",
+    "files": [
+      {{ "path": "string", "content": "string" }}
+    ]
+  }}
+}}
+"""
+        user_prompt = f"""
+Generate tests for the implementation.
 Context: {json.dumps(context, default=str)}
 
-Your task is to create a comprehensive test plan and test files.
-
-Return JSON with the following keys:
-- test_strategy: Overall testing strategy
-- unit_tests: List of unit tests to implement
-- validation_plan: How to validate the feature works
-- files: List of test file objects with 'path' and 'content' keys
-
-Example format:
-{{
-  "test_strategy": "Unit tests for service layer, integration tests for API endpoints",
-  "unit_tests": ["test_csv_generation", "test_export_endpoint", "test_file_download"],
-  "validation_plan": "Verify CSV file downloads correctly and contains expected data",
-  "files": [
-    {{
-      "path": "tests/test_csv_generator.py",
-      "content": "import unittest\\n\\nclass TestCSVGenerator(unittest.TestCase):\\n    def test_generate(self):\\n        pass"
-    }}
-  ]
-}}
-
-IMPORTANT: Include actual test code in the 'files' array."""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+WHAT TO DO (PLAYBOOK):
+1. Review Code: Check the Developer's output.
+2. Create Strategy: Define how you'll test the new feature.
+3. Write Tests: Output actual test code files.
+4. Prepare Envelope: Return your findings in the strict JSON envelope.
+"""
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_auditor_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        system_prompt = "You are the Auditor. Output JSON only."
-        
-        user_prompt = f"""Verify the project implementation.
+        system_prompt = f"""
+You are the Auditor.
+Your role is to verify project consistency, architecture, and security.{PromptBuilder.MEMORY_SEARCH_NOTE}
 
+Output rules:
+- Output valid JSON only with the EXACT envelope structure below.
+
+ENVELOPE SCHEMA:
+{{
+  "status": "success" | "partial" | "blocked",
+  "executive_summary": "string (1-3 sentences)",
+  "risks": ["string"],
+  "artifacts_produced": [],
+  "phase_data": {{
+    "architecture_consistency": true | false,
+    "missing_pieces": ["string"],
+    "security_risks": ["string"]
+  }}
+}}
+"""
+        user_prompt = f"""
+Verify the project implementation.
 Context: {json.dumps(context, default=str)}
 
-Your task is to audit the entire project for consistency and completeness.
-
-Return JSON with the following keys:
-- architecture_consistency: Boolean, whether architecture is consistent
-- missing_pieces: List of missing components or incomplete parts
-- security_risks: List of potential security issues
-
-Example format:
-{{
-  "architecture_consistency": true,
-  "missing_pieces": ["Error handling for large files", "Rate limiting on export endpoint"],
-  "security_risks": ["No validation of user permissions", "Potential path traversal in file export"]
-}}"""
-        
-        return {
-            "system_prompt": system_prompt,
-            "user_prompt": user_prompt
-        }
+WHAT TO DO (PLAYBOOK):
+1. Complete Audit: Verify if the implementation matches the proposal/architecture.
+2. Security Check: Search for potential vulnerabilities.
+3. Gap Analysis: Find any missing tasks.
+4. Prepare Envelope: Return your findings in the strict JSON envelope.
+"""
+        return {"system_prompt": system_prompt, "user_prompt": user_prompt}
 
     @staticmethod
     def _build_archivist_prompts(context: Dict[str, Any]) -> Dict[str, str]:
-        # Archivist doesn't need LLM, but return empty prompts for consistency
         return {
             "system_prompt": "You are the Archivist. No LLM needed.",
             "user_prompt": "Archivist automatically archives the project. No user input required."
         }
+

@@ -8,7 +8,7 @@ class DeveloperAgent(BaseAgent):
     
     def write_files(self, data: Dict[str, Any]) -> list[str]:
         """Write implementation files to disk. Returns list of file paths."""
-        files = data.get("files", [])
+        files = data.get("phase_data", data).get("files", [])
         from devhive.utils.filesystem import write_file
         file_paths = []
         for f in files:
@@ -32,17 +32,3 @@ Return JSON with keys: implementation_strategy, file_structure, pseudocode, file
         self.state_manager.add_files(file_paths)
         return self.save_artifact("implementation", data)
     
-    def generate_summary(self, data: Dict[str, Any]) -> str:
-        """Generate executive summary for Developer agent."""
-        if data.get("iterative_execution"):
-            tasks_count = data.get("total_tasks_completed", 0)
-            return f"Completed iterative implementation of {tasks_count} tasks."
-            
-        files_count = len(data.get("files", []))
-        strategy = data.get("implementation_strategy", "N/A")
-        # Truncate if too long
-        if len(strategy) > 80:
-            strategy = strategy[:80] + "..."
-        return (
-            f"Implemented {files_count} files using strategy: {strategy}"
-        )

@@ -1,19 +1,34 @@
 from typing import Dict, Any, Tuple, List
 
-
 class ResponseValidator:
     """
     Validates LLM responses for each agent.
-    Ensures responses contain required keys and valid data structures.
+    Ensures responses contain the standard Envelope and valid phase_data structures.
     """
 
     @staticmethod
-    def validate_ceo(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate CEO agent response.
+    def _validate_envelope(response: Dict[str, Any], agent_name: str) -> Tuple[bool, str]:
+        """Validate the standard envelope structure used by all agents except CEO/Archivist."""
+        if not isinstance(response, dict):
+            return False, f"{agent_name}: Response must be a JSON object"
+            
+        envelope_keys = ["status", "executive_summary", "risks", "artifacts_produced", "phase_data"]
+        missing = [k for k in envelope_keys if k not in response]
         
-        Expected keys: workflow_plan, reasoning
-        """
+        if missing:
+            return False, f"{agent_name}: Missing envelope keys: {', '.join(missing)}"
+            
+        if response["status"] not in ["success", "partial", "blocked"]:
+            return False, f"{agent_name}: 'status' must be one of: success, partial, blocked"
+            
+        if not isinstance(response["phase_data"], dict):
+            return False, f"{agent_name}: 'phase_data' must be an object"
+            
+        return True, ""
+
+    @staticmethod
+    def validate_ceo(response: Dict[str, Any]) -> Tuple[bool, str]:
+        """CEO uses a custom structure, not the standard envelope."""
         required_keys = ["workflow_plan", "reasoning"]
         is_valid, error = ResponseValidator._validate_keys(response, required_keys, "CEO")
         if not is_valid:
@@ -25,204 +40,128 @@ class ResponseValidator:
         valid_agents = ["Explorer", "Proposal", "Architect", "TaskPlanner", "Developer", "QA", "Auditor", "Archivist"]
         for agent in response["workflow_plan"]:
             if agent not in valid_agents:
-                return False, f"CEO: Invalid agent name '{agent}' in workflow_plan. Valid agents are: {', '.join(valid_agents)}"
+                return False, f"CEO: Invalid agent name '{agent}'"
                 
         return True, ""
 
     @staticmethod
     def validate_explorer(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate Explorer agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "Explorer")
+        if not is_valid: return False, error
         
-        Expected keys: user_needs, constraints, dependencies, risks, complexity, suggested_workflow
-        Optional keys: new_guidelines_content, clarification_question
-        """
-        required_keys = ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow"]
-        is_valid, error = ResponseValidator._validate_keys(response, required_keys, "Explorer")
-        if not is_valid:
-            return is_valid, error
-            
-        if "new_guidelines_content" in response and not isinstance(response["new_guidelines_content"], str):
-             return False, "Explorer: 'new_guidelines_content' must be a string"
-             
-        if "clarification_question" in response and not isinstance(response["clarification_question"], str):
-             return False, "Explorer: 'clarification_question' must be a string"
-             
-        return True, ""
+        phase_data = response["phase_data"]
+        required_keys = ["user_needs", "constraints", "dependencies", "complexity", "suggested_workflow"]
+        return ResponseValidator._validate_keys(phase_data, required_keys, "Explorer phase_data")
 
     @staticmethod
     def validate_proposal(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate Proposal agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "Proposal")
+        if not is_valid: return False, error
         
-        Expected keys: feature_description, user_value, acceptance_criteria, scope
-        """
+        phase_data = response["phase_data"]
         required_keys = ["feature_description", "user_value", "acceptance_criteria", "scope"]
-        return ResponseValidator._validate_keys(response, required_keys, "Proposal")
+        return ResponseValidator._validate_keys(phase_data, required_keys, "Proposal phase_data")
 
     @staticmethod
     def validate_architect(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate Architect agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "Architect")
+        if not is_valid: return False, error
         
-        Expected keys: architecture_pattern, components, data_models, apis
-        """
+        phase_data = response["phase_data"]
         required_keys = ["architecture_pattern", "components", "data_models", "apis"]
-        return ResponseValidator._validate_keys(response, required_keys, "Architect")
+        return ResponseValidator._validate_keys(phase_data, required_keys, "Architect phase_data")
 
     @staticmethod
     def validate_task_planner(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate TaskPlanner agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "TaskPlanner")
+        if not is_valid: return False, error
         
-        Expected keys: epics, tasks, estimated_complexity
-        Tasks should now include: id, name, description, depends_on, files_involved
-        """
+        phase_data = response["phase_data"]
         required_keys = ["epics", "tasks", "estimated_complexity"]
-        is_valid, error_msg = ResponseValidator._validate_keys(response, required_keys, "TaskPlanner")
+        is_valid, error_msg = ResponseValidator._validate_keys(phase_data, required_keys, "TaskPlanner phase_data")
+        if not is_valid: return False, error_msg
         
-        if not is_valid:
-            return is_valid, error_msg
-        
-        # Additional validation: tasks should be a list
-        if not isinstance(response.get("tasks"), list):
-            return False, "TaskPlanner: 'tasks' must be a list of task objects"
-        
-        # Validate task structure for parallel development
-        tasks = response.get("tasks", [])
-        for idx, task in enumerate(tasks):
+        if not isinstance(phase_data.get("tasks"), list):
+            return False, "TaskPlanner phase_data: 'tasks' must be a list"
+            
+        for idx, task in enumerate(phase_data.get("tasks", [])):
             if not isinstance(task, dict):
-                return False, f"TaskPlanner: Task at index {idx} must be a dict"
-            
-            # Check for required task fields
-            task_required = ["id", "name", "description"]
-            missing_in_task = [key for key in task_required if key not in task]
-            if missing_in_task:
-                return False, f"TaskPlanner: Task at index {idx} missing keys: {', '.join(missing_in_task)}"
-            
-            # depends_on should be a list if present
-            if "depends_on" in task and not isinstance(task["depends_on"], list):
-                return False, f"TaskPlanner: Task '{task.get('id')}' - 'depends_on' must be a list"
-        
+                return False, f"TaskPlanner phase_data: Task at {idx} must be a dict"
+            if "name" not in task or "description" not in task:
+                return False, f"TaskPlanner phase_data: Task at {idx} missing 'name' or 'description'"
+                
         return True, ""
 
     @staticmethod
     def validate_developer(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate Developer agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "Developer")
+        if not is_valid: return False, error
         
-        Expected keys: implementation_strategy, file_structure, pseudocode, files
-        """
+        phase_data = response["phase_data"]
         required_keys = ["implementation_strategy", "file_structure", "files"]
-        is_valid, error_msg = ResponseValidator._validate_keys(response, required_keys, "Developer")
+        is_valid, error_msg = ResponseValidator._validate_keys(phase_data, required_keys, "Developer phase_data")
+        if not is_valid: return False, error_msg
         
-        if not is_valid:
-            return is_valid, error_msg
-        
-        # Additional validation: files should be a list with path and content
-        files = response.get("files", [])
+        files = phase_data.get("files", [])
         if not isinstance(files, list):
-            return False, "Developer: 'files' must be a list of file objects"
-        
-        for idx, file_obj in enumerate(files):
-            if not isinstance(file_obj, dict):
-                return False, f"Developer: File at index {idx} must be a dict with 'path' and 'content'"
-            if "path" not in file_obj or "content" not in file_obj:
-                return False, f"Developer: File at index {idx} missing 'path' or 'content' keys"
-        
+            return False, "Developer phase_data: 'files' must be a list"
+            
+        for idx, f in enumerate(files):
+            if not isinstance(f, dict) or "path" not in f or "content" not in f:
+                return False, f"Developer phase_data: File at {idx} missing 'path' or 'content'"
+                
         return True, ""
 
     @staticmethod
     def validate_qa(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate QA agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "QA")
+        if not is_valid: return False, error
         
-        Expected keys: test_strategy, unit_tests, validation_plan, files
-        """
+        phase_data = response["phase_data"]
         required_keys = ["test_strategy", "unit_tests", "validation_plan", "files"]
-        is_valid, error_msg = ResponseValidator._validate_keys(response, required_keys, "QA")
+        is_valid, error_msg = ResponseValidator._validate_keys(phase_data, required_keys, "QA phase_data")
+        if not is_valid: return False, error_msg
         
-        if not is_valid:
-            return is_valid, error_msg
-        
-        # Additional validation: files should be a list with path and content
-        files = response.get("files", [])
+        files = phase_data.get("files", [])
         if not isinstance(files, list):
-            return False, "QA: 'files' must be a list of test file objects"
-        
-        for idx, file_obj in enumerate(files):
-            if not isinstance(file_obj, dict):
-                return False, f"QA: File at index {idx} must be a dict with 'path' and 'content'"
-            if "path" not in file_obj or "content" not in file_obj:
-                return False, f"QA: File at index {idx} missing 'path' or 'content' keys"
-        
+            return False, "QA phase_data: 'files' must be a list"
+            
+        for idx, f in enumerate(files):
+            if not isinstance(f, dict) or "path" not in f or "content" not in f:
+                return False, f"QA phase_data: File at {idx} missing 'path' or 'content'"
+                
         return True, ""
 
     @staticmethod
     def validate_auditor(response: Dict[str, Any]) -> Tuple[bool, str]:
-        """
-        Validate Auditor agent response.
+        is_valid, error = ResponseValidator._validate_envelope(response, "Auditor")
+        if not is_valid: return False, error
         
-        Expected keys: architecture_consistency, missing_pieces, security_risks
-        """
+        phase_data = response["phase_data"]
         required_keys = ["architecture_consistency", "missing_pieces", "security_risks"]
-        is_valid, error_msg = ResponseValidator._validate_keys(response, required_keys, "Auditor")
-        
-        if not is_valid:
-            return is_valid, error_msg
-        
-        # Additional validation: architecture_consistency should be boolean
-        if not isinstance(response.get("architecture_consistency"), bool):
-            return False, "Auditor: 'architecture_consistency' must be a boolean (true/false)"
-        
-        return True, ""
+        return ResponseValidator._validate_keys(phase_data, required_keys, "Auditor phase_data")
 
     @staticmethod
     def _validate_keys(response: Dict[str, Any], required_keys: List[str], agent_name: str) -> Tuple[bool, str]:
-        """
-        Helper method to validate that all required keys exist in response.
-        
-        Args:
-            response: The response dict to validate
-            required_keys: List of required key names
-            agent_name: Name of the agent (for error messages)
-        
-        Returns:
-            Tuple of (is_valid, error_message)
-        """
         if not isinstance(response, dict):
-            return False, f"{agent_name}: Response must be a JSON object/dict, got {type(response).__name__}"
-        
-        missing_keys = [key for key in required_keys if key not in response]
-        
+            return False, f"{agent_name}: Response must be a dict"
+        missing_keys = [k for k in required_keys if k not in response]
         if missing_keys:
-            return False, f"{agent_name}: Missing required keys: {', '.join(missing_keys)}. Required keys are: {', '.join(required_keys)}"
-        
+            return False, f"{agent_name}: Missing required keys: {', '.join(missing_keys)}"
         return True, ""
 
     @staticmethod
     def get_expected_keys(agent_role: str) -> List[str]:
-        """
-        Get the list of expected keys for a given agent role.
-        Useful for error messages and documentation.
-        
-        Args:
-            agent_role: The agent role name
-        
-        Returns:
-            List of expected key names
-        """
+        envelope = ["status", "executive_summary", "risks", "artifacts_produced", "phase_data"]
         key_mapping = {
             "CEO": ["workflow_plan", "reasoning"],
-            "Explorer": ["user_needs", "constraints", "dependencies", "risks", "complexity", "suggested_workflow", "new_guidelines_content", "clarification_question"],
-            "Proposal": ["feature_description", "user_value", "acceptance_criteria", "scope"],
-            "Architect": ["architecture_pattern", "components", "data_models", "apis"],
-            "TaskPlanner": ["epics", "tasks (with id, name, description, depends_on, files_involved)", "estimated_complexity"],
-            "Developer": ["implementation_strategy", "file_structure", "files"],
-            "TaskDistributor": ["implementation_strategy", "file_structure", "files", "parallel_execution", "total_tasks"],
-            "QA": ["test_strategy", "unit_tests", "validation_plan", "files"],
-            "Auditor": ["architecture_consistency", "missing_pieces", "security_risks"],
-            "Archivist": []  # No validation needed
+            "Explorer": envelope,
+            "Proposal": envelope,
+            "Architect": envelope,
+            "TaskPlanner": envelope,
+            "Developer": envelope,
+            "QA": envelope,
+            "Auditor": envelope,
+            "Archivist": []
         }
-        
         return key_mapping.get(agent_role, [])

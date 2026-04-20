@@ -8,7 +8,7 @@ class QAAgent(BaseAgent):
     
     def write_test_files(self, data: Dict[str, Any]) -> list[str]:
         """Write test files to disk. Returns list of file paths."""
-        files = data.get("files", [])
+        files = data.get("phase_data", data).get("files", [])
         from devhive.utils.filesystem import write_file
         file_paths = []
         for f in files:
@@ -32,15 +32,3 @@ Return JSON with keys: test_strategy, unit_tests, validation_plan, files (list o
         self.state_manager.add_files(file_paths)
         return self.save_artifact("tests", data)
     
-    def generate_summary(self, data: Dict[str, Any]) -> str:
-        """Generate executive summary for QA agent."""
-        tests_count = len(data.get("unit_tests", []))
-        files_count = len(data.get("files", []))
-        strategy = data.get("test_strategy", "N/A")
-        # Truncate if too long
-        if len(strategy) > 60:
-            strategy = strategy[:60] + "..."
-        return (
-            f"Generated {tests_count} unit tests across {files_count} test files. "
-            f"Strategy: {strategy}"
-        )

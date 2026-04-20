@@ -17,12 +17,3 @@ Return JSON with keys: architecture_pattern, components, data_models, apis."""
         data = self._parse_json(resp)
         return self.save_artifact("architecture", data)
     
-    def generate_summary(self, data: Dict[str, Any]) -> str:
-        """Generate executive summary for Architect agent."""
-        components_count = len(data.get("components", []))
-        apis_count = len(data.get("apis", []))
-        pattern = data.get("architecture_pattern", "N/A")
-        return (
-            f"Designed architecture using {pattern} pattern "
-            f"with {components_count} components and {apis_count} APIs."
-        )

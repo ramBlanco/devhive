@@ -195,8 +195,8 @@ class TaskOrchestrator:
                 
                 # Save this task's results
                 dev_progress["task_results"][task_id] = {
-                    "files": [f.get("path") for f in data.get("files", []) if isinstance(f, dict) and "path" in f],
-                    "implementation_strategy": data.get("implementation_strategy", "")
+                    "files": [f.get("path") for f in data.get("phase_data", data).get("files", []) if isinstance(f, dict) and "path" in f],
+                    "implementation_strategy": data.get("phase_data", data).get("implementation_strategy", "")
                 }
                 dev_progress["completed_tasks"].append(current_task)
                 
@@ -239,9 +239,9 @@ class TaskOrchestrator:
                 file_paths = agent.write_test_files(data)
                 self.state_manager.add_files(file_paths)
             elif agent_name == "Explorer":
-                if "new_guidelines_content" in data:
+                if "new_guidelines_content" in data.get("phase_data", data):
                     from devhive.utils.filesystem import write_file
-                    write_file("GUIDELINES.md", data["new_guidelines_content"])
+                    write_file("GUIDELINES.md", data.get("phase_data", data).get("new_guidelines_content"))
         
         # Generate executive summary
         summary = self._generate_summary(agent_name, data)
@@ -319,10 +319,10 @@ class TaskOrchestrator:
     def _generate_summary(self, agent_name: str, data: Dict[str, Any]) -> str:
         """
         Generate 1-3 sentence executive summary of agent's work.
-        
-        This is a default implementation. Individual agents can override
-        via their generate_summary() method for more specific summaries.
         """
+        if "executive_summary" in data:
+            return data["executive_summary"]
+            
         summaries = {
             "CEO": self._summarize_ceo,
             "Explorer": self._summarize_explorer,
@@ -336,7 +336,8 @@ class TaskOrchestrator:
         }
         
         summarizer = summaries.get(agent_name, lambda x: f"{agent_name} completed successfully.")
-        return summarizer(data)
+        return summarizer(data.get("phase_data", data))
+
 
     def _summarize_ceo(self, data: Dict[str, Any]) -> str:
         """Generate summary for CEO agent."""
@@ -353,10 +354,10 @@ class TaskOrchestrator:
         )
         
         extra_info = []
-        if "new_guidelines_content" in data:
+        if "new_guidelines_content" in data.get("phase_data", data):
             extra_info.append("Created GUIDELINES.md with best practices.")
-        if "clarification_question" in data:
-            extra_info.append(f"QUESTION FOR USER: {data['clarification_question']}")
+        if "clarification_question" in data.get("phase_data", data):
+            extra_info.append(f"QUESTION FOR USER: {data.get('phase_data', data).get('clarification_question')}")
             
         if extra_info:
             return f"{base_summary} {' '.join(extra_info)}"
@@ -396,7 +397,7 @@ class TaskOrchestrator:
             tasks_count = data.get("total_tasks_completed", 0)
             return f"Completed iterative implementation of {tasks_count} tasks."
             
-        files_count = len(data.get("files", []))
+        files_count = len(data.get("phase_data", data).get("files", []))
         return (
             f"Implemented {files_count} files for current task using strategy: "
             f"{data.get('implementation_strategy', 'N/A')[:80]}..."
@@ -405,7 +406,7 @@ class TaskOrchestrator:
     def _summarize_qa(self, data: Dict[str, Any]) -> str:
         """Generate summary for QA agent."""
         tests_count = len(data.get("unit_tests", []))
-        files_count = len(data.get("files", []))
+        files_count = len(data.get("phase_data", data).get("files", []))
         return (
             f"Generated {tests_count} unit tests across {files_count} test files. "
             f"Strategy: {data.get('test_strategy', 'N/A')[:60]}..."
