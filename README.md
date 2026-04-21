@@ -14,8 +14,9 @@ DevHive is composed of specialized Agent Skills that work sequentially:
 4. **`devhive-taskplanner`**: Breaks the architecture into actionable items, separating infrastructure and application code in `04-tasks.md`
 5. **`devhive-devops`**: Writes Infrastructure as Code (IaC) (Terraform, CDK, Docker) and checks off `## Infrastructure Tasks` in `04-tasks.md`
 6. **`devhive-developer`**: Writes the actual business logic and checks off `## Application Tasks` in `04-tasks.md`
-7. **`devhive-qa`**: Writes test cases and test plans in `05-qa-plan.md`
-8. **`devhive-auditor`**: Performs a final check and writes `06-audit.md`
+7. **`devhive-sast`**: Performs a Static Application Security Testing (SAST) scan and writes `05-sast-report.md`
+8. **`devhive-qa`**: Writes test cases and test plans in `06-qa-plan.md`
+9. **`devhive-auditor`**: Performs a final check and writes `07-audit.md`
 
 All of this is managed by the **`devhive-orchestrator`** skill.
 
@@ -35,7 +36,7 @@ Instead of using OpenCode as a general assistant, invoke the dedicated `@devhive
 @devhive Build a script that converts CSV to JSON running on AWS Lambda.
 ```
 
-The agent will automatically load the orchestrator skill and start the 8-phase pipeline!
+The agent will automatically load the orchestrator skill and start the 9-phase pipeline!
 
 ### Continuous Mode
 By default, the orchestrator will pause and ask for your approval after writing each specification file (e.g., after writing the architecture design). If you want it to run entirely autonomously without stopping, you can add the "continuous mode" flag to your prompt:

@@ -17,12 +17,12 @@ Read all specs from `.devhive/specs/` and review the final codebase state.
 3. **Completeness Check**: Ensure all acceptance criteria are met and all tasks are completed.
 
 ## Output
-You MUST use the `Write` tool to save your audit report to `.devhive/specs/06-audit.md`.
+You MUST use the `Write` tool to save your audit report to `.devhive/specs/07-audit.md`.
 
 The markdown file should be structured as follows:
 
 ```markdown
-# Phase 06: Audit Report
+# Phase 07: Audit Report
 
 ## Executive Summary
 [1-3 sentences summarizing the audit result: Pass/Fail]

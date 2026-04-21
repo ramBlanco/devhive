@@ -19,12 +19,12 @@ Read `.devhive/specs/02-proposal.md` (for acceptance criteria) and review the co
 
 ## Output
 Write actual test files to the codebase.
-You MUST use the `Write` tool to save your test plan to `.devhive/specs/05-qa-plan.md`.
+You MUST use the `Write` tool to save your test plan to `.devhive/specs/06-qa-plan.md`.
 
 The markdown file should be structured as follows:
 
 ```markdown
-# Phase 05: QA Plan
+# Phase 06: QA Plan
 
 ## Executive Summary
 [1-3 sentences summarizing the testing approach]
