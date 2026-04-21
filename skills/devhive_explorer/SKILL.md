@@ -12,7 +12,7 @@ When the orchestrator assigns you the exploration phase for a feature request.
 You will receive the user's feature request from the orchestrator.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load your hardcoded skills: `requirements-analyst`.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load your hardcoded skills: `requirements-analyst`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Understand the Request**: Determine if it is a new feature, a bug fix, or a refactor.
 2. **Project Guidelines (Hybrid Approach)**: Use your tools to check if a `GUIDELINES.md` or `AGENTS.md` file exists in the root of the project.
    - **If YES**: Read it to understand the enforced tech stack and architectural rules.

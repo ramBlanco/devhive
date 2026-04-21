@@ -12,7 +12,7 @@ When the orchestrator assigns you the task planning phase after the architecture
 Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `agile-scrum-master`.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `agile-scrum-master`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Review Context**: Understand the architectural components, infrastructure needs, data models, design systems, and the acceptance criteria.
 2. **Define Design Tasks**: Define tasks for the Designer (e.g., configuring CSS vars, setting up Tailwind config, base visual skeleton).
 3. **Define Infrastructure Tasks**: If the architecture requires new databases, Terraform, Docker files, CI/CD pipelines, or cloud resources, define these as specific tasks.

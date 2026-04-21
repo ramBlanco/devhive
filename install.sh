@@ -19,4 +19,11 @@ cp -r skills/devhive_* "$SKILLS_DIR/"
 echo "Copying DevHive Agent to $AGENTS_DIR..."
 cp agents/devhive.md "$AGENTS_DIR/" 2>/dev/null || echo "Warning: agents/devhive.md not found locally, skipping agent installation."
 
+echo "Installing community support skills..."
+if [ -f "./update-skills.sh" ]; then
+    bash ./update-skills.sh
+else
+    echo "Warning: update-skills.sh not found."
+fi
+
 echo "Installation complete! You can now use the @devhive agent in OpenCode."
