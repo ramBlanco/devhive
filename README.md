@@ -26,18 +26,34 @@ To use DevHive in your OpenCode environment, run the install script. It will cop
 ./install.sh
 ```
 
-## Usage
+## Usage (Automatic Trigger)
 
-In OpenCode, simply ask the orchestrator to build your feature:
+OpenCode is smart enough to detect DevHive. It will **automatically** use the `devhive-orchestrator` skill if it detects that you are in a DevHive project.
+
+To initialize a project as a DevHive project, simply create a `.devhive/` directory:
+
+```bash
+mkdir .devhive
+```
+
+Now, just ask OpenCode to build your feature normally:
 
 ```
-> Use the devhive-orchestrator skill to build a script that converts CSV to JSON.
+> Build a script that converts CSV to JSON.
 ```
 
+OpenCode will see the `.devhive/` folder, load the `devhive-orchestrator` skill silently, and start the 7-phase pipeline automatically!
+
+### Continuous Mode
 By default, the orchestrator will pause and ask for your approval after writing each specification file (e.g., after writing the architecture design). If you want it to run entirely autonomously without stopping, you can add the "continuous mode" flag to your prompt:
 
 ```
-> Use the devhive-orchestrator skill to build a React landing page. Run in continuous mode with no pauses.
+> Build a React landing page. Run in continuous mode with no pauses.
+```
+
+Or permanently enable it for the project by creating a flag file:
+```bash
+touch .devhive/continuous
 ```
 
 ## Why SDD (Skill-Driven Development)?
