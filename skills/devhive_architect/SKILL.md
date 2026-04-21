@@ -15,8 +15,10 @@ Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`.
 1. **Review Context**: Understand the scope and acceptance criteria from the proposal.
 2. **System Design**: Decide on the architectural pattern to use (e.g., MVC, specific design patterns, service layers) that aligns with the existing codebase.
 3. **Component Breakdown**: Identify the new components, classes, or modules that need to be created or modified.
-4. **Interface Design**: Design the data models, schemas, and APIs/interfaces that will connect the components.
-5. **Infrastructure & Deployment**: Determine what infrastructure is needed (e.g., Docker, Terraform, AWS services, databases) to support this architecture.
+4. **Interface Design**: Design the APIs/interfaces that will connect the components.
+5. **Data Architecture**: Design the data models, database schemas, entities, relationships, indexes, and migration strategies.
+6. **UX/UI & Design System**: Define the core visual language, layout structure, color palettes, accessibility standards, and a "Design System" skeleton for the frontend.
+7. **Infrastructure & Deployment**: Determine what infrastructure is needed (e.g., Docker, Terraform, AWS services, databases) to support this architecture.
 
 ## Output
 You MUST use the `Write` tool to save your design to `.devhive/specs/03-architecture.md`.
@@ -32,11 +34,14 @@ The markdown file should be structured as follows:
 ## Architecture Pattern
 [Description of the pattern chosen and why]
 
+## UX/UI & Design System
+[Color palettes, typography, accessibility rules, layout wireframes in text, component library selection]
+
 ## Components & Modules
 - **[Component Name]**: [Description of its responsibility]
 
-## Data Models / State
-- **[Model Name]**: [Description of fields/state]
+## Data Architecture & Models
+- **[Model Name]**: [Description of fields, relationships, indexes, and migration plan]
 
 ## APIs / Interfaces
 - `[Function/Endpoint Signature]`: [Description of inputs/outputs]

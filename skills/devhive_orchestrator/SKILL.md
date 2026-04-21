@@ -14,22 +14,32 @@ The typical SDD pipeline consists of the following phases and their correspondin
 2. `devhive-proposal` -> `02-proposal.md`
 3. `devhive-architect` -> `03-architecture.md`
 4. `devhive-taskplanner` -> `04-tasks.md`
-5. `devhive-devops` -> implements infrastructure and checks off tasks under `## Infrastructure Tasks` in `04-tasks.md`
-6. `devhive-backender` -> writes backend logic and checks off tasks under `## Backend Tasks` in `04-tasks.md`
-7. `devhive-frontender` -> writes frontend logic and checks off tasks under `## Frontend Tasks` in `04-tasks.md`
-8. `devhive-sast` -> performs security scan and writes `05-sast-report.md`
-9. `devhive-qa` -> writes tests and `06-qa-plan.md`
-10. `devhive-auditor` -> `07-audit.md`
+5. `devhive-designer` -> configures design systems under `## Design Tasks` in `04-tasks.md`
+6. `devhive-devops` -> implements infrastructure under `## Infrastructure Tasks` in `04-tasks.md`
+7. `devhive-dba` -> creates migrations/schemas under `## Data Tasks` in `04-tasks.md`
+8. `devhive-backender` -> writes backend logic under `## Backend Tasks` in `04-tasks.md`
+9. `devhive-frontender` -> writes frontend logic under `## Frontend Tasks` in `04-tasks.md`
+10. `devhive-perf` -> writes load testing scripts under `## Performance Tasks` in `04-tasks.md`
+11. `devhive-techwriter` -> writes documentation under `## Documentation Tasks` in `04-tasks.md`
+12. `devhive-releaser` -> manages semantic versioning under `## Release Tasks` in `04-tasks.md`
+13. `devhive-sast` -> performs security scan and writes `05-sast-report.md`
+14. `devhive-qa` -> writes tests and `06-qa-plan.md`
+15. `devhive-auditor` -> `07-audit.md`
 
 ## Playbook (Execution Loop)
 
 1. **Check State**: Look at the files in `.devhive/specs/`. Determine what the next missing phase is. If no files exist, the next phase is `exploration`.
 2. **Determine Sub-Skill**: Based on the missing phase, decide which skill to invoke.
-   - If `04-tasks.md` exists but `05-sast-report.md` does not, check `04-tasks.md`:
-     - Are there unchecked tasks `[ ]` under `## Infrastructure Tasks`? -> Invoke `devhive-devops`.
-     - If Infrastructure is done `[x]` but there are unchecked tasks `[ ]` under `## Backend Tasks`? -> Invoke `devhive-backender`.
-     - If Infra and Backend are done `[x]` but there are unchecked tasks `[ ]` under `## Frontend Tasks`? -> Invoke `devhive-frontender`.
-     - If all sections are fully `[x]`, proceed to `devhive-sast`.
+   - If `04-tasks.md` exists but `05-sast-report.md` does not, check `04-tasks.md` sequentially:
+     - Are there unchecked tasks `[ ]` under `## Design Tasks`? -> Invoke `devhive-designer`.
+     - Else, are there unchecked tasks `[ ]` under `## Infrastructure Tasks`? -> Invoke `devhive-devops`.
+     - Else, are there unchecked tasks `[ ]` under `## Data Tasks`? -> Invoke `devhive-dba`.
+     - Else, are there unchecked tasks `[ ]` under `## Backend Tasks`? -> Invoke `devhive-backender`.
+     - Else, are there unchecked tasks `[ ]` under `## Frontend Tasks`? -> Invoke `devhive-frontender`.
+     - Else, are there unchecked tasks `[ ]` under `## Performance Tasks`? -> Invoke `devhive-perf`.
+     - Else, are there unchecked tasks `[ ]` under `## Documentation Tasks`? -> Invoke `devhive-techwriter`.
+     - Else, are there unchecked tasks `[ ]` under `## Release Tasks`? -> Invoke `devhive-releaser`.
+     - If ALL sections are fully `[x]`, proceed to `devhive-sast`.
    - If `05-sast-report.md` exists but `06-qa-plan.md` does not -> Invoke `devhive-qa`.
    - If `06-qa-plan.md` exists but `07-audit.md` does not -> Invoke `devhive-auditor`.
 3. **Launch Task**: Use the `Task` tool (with `subagent_type="general"`) to launch the sub-agent.

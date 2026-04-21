@@ -10,14 +10,19 @@ DevHive is composed of specialized Agent Skills that work sequentially:
 
 1. **`devhive-explorer`**: Analyzes the request and writes `.devhive/specs/01-exploration.md`
 2. **`devhive-proposal`**: Creates acceptance criteria in `02-proposal.md`
-3. **`devhive-architect`**: Designs the system architecture and cloud infrastructure in `03-architecture.md`
-4. **`devhive-taskplanner`**: Breaks the architecture into actionable items, separating infrastructure, backend, and frontend code in `04-tasks.md`
-5. **`devhive-devops`**: Writes Infrastructure as Code (IaC) (Terraform, CDK, Docker) and checks off `## Infrastructure Tasks` in `04-tasks.md`
-6. **`devhive-backender`**: Initializes the project, writes APIs and server logic, and checks off `## Backend Tasks` in `04-tasks.md`
-7. **`devhive-frontender`**: Writes UI components and client-side logic to consume the APIs, and checks off `## Frontend Tasks` in `04-tasks.md`
-8. **`devhive-sast`**: Performs a Static Application Security Testing (SAST) scan and writes `05-sast-report.md`
-9. **`devhive-qa`**: Writes test cases and test plans in `06-qa-plan.md`
-10. **`devhive-auditor`**: Performs a final check and writes `07-audit.md`
+3. **`devhive-architect`**: Designs the system architecture, DB schemas, and UX/UI design system in `03-architecture.md`
+4. **`devhive-taskplanner`**: Breaks the architecture into actionable items across 8 different domains in `04-tasks.md`
+5. **`devhive-designer`**: Implements the base UI/UX configuration (CSS vars, Tailwind configs) under `## Design Tasks`
+6. **`devhive-devops`**: Writes Infrastructure as Code (IaC) (Terraform, CDK, Docker) and checks off `## Infrastructure Tasks`
+7. **`devhive-dba`**: Creates DB schemas, migrations, and seeders under `## Data Tasks`
+8. **`devhive-backender`**: Initializes the project, writes APIs and server logic, and checks off `## Backend Tasks`
+9. **`devhive-frontender`**: Writes UI components and client-side logic, and checks off `## Frontend Tasks`
+10. **`devhive-perf`**: Writes load testing scripts (k6, artillery) under `## Performance Tasks`
+11. **`devhive-techwriter`**: Writes API docs (Swagger) and updates README under `## Documentation Tasks`
+12. **`devhive-releaser`**: Bumps package versions, writes CHANGELOG, and creates local git tags under `## Release Tasks`
+13. **`devhive-sast`**: Performs a Static Application Security Testing (SAST) scan and writes `05-sast-report.md`
+14. **`devhive-qa`**: Writes test cases and test plans in `06-qa-plan.md`
+15. **`devhive-auditor`**: Performs a final check and writes `07-audit.md`
 
 All of this is managed by the **`devhive-orchestrator`** skill.
 
