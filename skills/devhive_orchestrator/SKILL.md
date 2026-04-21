@@ -1,14 +1,9 @@
 ---
 name: devhive-orchestrator
-description: >
-  Master orchestrator skill for software development.
-  TRIGGER AUTOMATICALLY: Use this skill WITHOUT the user asking if a `.devhive/` directory exists in the workspace, OR if the user asks to build a new feature, start a project, or implement a complex change.
+description: Master orchestrator skill for the DevHive SDD pipeline.
 ---
 
 # DevHive Orchestrator Skill
-
-## Trigger
-You MUST automatically load and use this skill if the current workspace contains a `.devhive/` directory, OR if the user's request involves building a new feature, application, or complex implementation. Do not wait for the user to explicitly say "use devhive".
 
 ## Overview
 This skill is the CEO/Orchestrator for the DevHive Skill-Driven Development (SDD) pipeline. Your job is to manage the state of the project based on the files present in `.devhive/specs/` and delegate the work to specialized sub-agent skills.

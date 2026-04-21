@@ -1,6 +1,6 @@
 # DevHive: Skill-Driven Development (SDD) for OpenCode
 
-DevHive is a fully autonomous AI software development pipeline designed specifically as a set of Skills for **OpenCode**.
+DevHive is a fully autonomous AI software development pipeline designed specifically as a set of Skills and a dedicated Agent for **OpenCode**.
 
 It replaces complex background servers and in-memory states with a transparent, predictable, and local **Skill-Driven Development (SDD)** architecture. DevHive uses your file system (`.devhive/specs/`) as its database, generating readable Markdown files at each step of the software lifecycle.
 
@@ -20,39 +20,32 @@ All of this is managed by the **`devhive-orchestrator`** skill.
 
 ## Installation
 
-To use DevHive in your OpenCode environment, run the install script. It will copy the skills into your local OpenCode configuration folder (`~/.config/opencode/skills/`).
+To use DevHive in your OpenCode environment, run the install script. It will copy the skills and the `@devhive` agent profile into your local OpenCode configuration folder (`~/.config/opencode/`).
 
 ```bash
 ./install.sh
 ```
 
-## Usage (Automatic Trigger)
+## Usage (The `@devhive` Agent)
 
-OpenCode is smart enough to detect DevHive. It will **automatically** use the `devhive-orchestrator` skill if it detects that you are in a DevHive project.
-
-To initialize a project as a DevHive project, simply create a `.devhive/` directory:
-
-```bash
-mkdir .devhive
-```
-
-Now, just ask OpenCode to build your feature normally:
+Instead of using OpenCode as a general assistant, invoke the dedicated `@devhive` agent. This agent is hardwired to immediately start the SDD pipeline.
 
 ```
-> Build a script that converts CSV to JSON.
+@devhive Build a script that converts CSV to JSON.
 ```
 
-OpenCode will see the `.devhive/` folder, load the `devhive-orchestrator` skill silently, and start the 7-phase pipeline automatically!
+The agent will automatically load the orchestrator skill and start the 7-phase pipeline!
 
 ### Continuous Mode
 By default, the orchestrator will pause and ask for your approval after writing each specification file (e.g., after writing the architecture design). If you want it to run entirely autonomously without stopping, you can add the "continuous mode" flag to your prompt:
 
 ```
-> Build a React landing page. Run in continuous mode with no pauses.
+@devhive Build a React landing page. Run in continuous mode with no pauses.
 ```
 
 Or permanently enable it for the project by creating a flag file:
 ```bash
+mkdir -p .devhive
 touch .devhive/continuous
 ```
 
