@@ -1,12 +1,17 @@
 ---
 name: devhive-orchestrator
-description: Master orchestrator skill that drives the DevHive Skill-Driven Development (SDD) pipeline.
+description: >
+  Master orchestrator skill for software development.
+  TRIGGER AUTOMATICALLY: Use this skill WITHOUT the user asking if a `.devhive/` directory exists in the workspace, OR if the user asks to build a new feature, start a project, or implement a complex change.
 ---
 
 # DevHive Orchestrator Skill
 
+## Trigger
+You MUST automatically load and use this skill if the current workspace contains a `.devhive/` directory, OR if the user's request involves building a new feature, application, or complex implementation. Do not wait for the user to explicitly say "use devhive".
+
 ## Overview
-This skill replaces the old DevHive MCP server. You are the CEO/Orchestrator. Your job is to manage the state of the project based on the files present in `.devhive/specs/` and delegate the work to specialized sub-agent skills.
+This skill is the CEO/Orchestrator for the DevHive Skill-Driven Development (SDD) pipeline. Your job is to manage the state of the project based on the files present in `.devhive/specs/` and delegate the work to specialized sub-agent skills.
 
 ## The Pipeline
 The typical SDD pipeline consists of the following phases and their corresponding output files:
@@ -27,5 +32,5 @@ The typical SDD pipeline consists of the following phases and their correspondin
 4. **Evaluate the Result**:
    - Verify that the sub-agent successfully created the required `.devhive/specs/XX-name.md` file.
    - **Pause (Default Behavior)**: Stop and ask the user for approval. Show them the path of the newly created spec and ask if they want to proceed.
-   - **Continuous Mode**: If the user explicitly requested "continuous mode" or "no pauses" in their initial prompt, DO NOT STOP. Automatically proceed to step 1 to launch the next phase.
+   - **Continuous Mode**: If the user explicitly requested "continuous mode", "no pauses", or if the project has a `.devhive/continuous` flag file, DO NOT STOP. Automatically proceed to step 1 to launch the next phase.
 5. **Completion**: The pipeline is complete when the Auditor finishes and writes `06-audit.md`. Inform the user that the project is successfully built.
