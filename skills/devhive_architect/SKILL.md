@@ -1,6 +1,6 @@
 ---
 name: devhive-architect
-description: Designs the technical architecture, components, and data models for the feature.
+description: Designs the technical architecture, components, data models, and infrastructure for the feature.
 ---
 
 # DevHive Architect Skill
@@ -16,6 +16,7 @@ Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`.
 2. **System Design**: Decide on the architectural pattern to use (e.g., MVC, specific design patterns, service layers) that aligns with the existing codebase.
 3. **Component Breakdown**: Identify the new components, classes, or modules that need to be created or modified.
 4. **Interface Design**: Design the data models, schemas, and APIs/interfaces that will connect the components.
+5. **Infrastructure & Deployment**: Determine what infrastructure is needed (e.g., Docker, Terraform, AWS services, databases) to support this architecture.
 
 ## Output
 You MUST use the `Write` tool to save your design to `.devhive/specs/03-architecture.md`.
@@ -39,4 +40,7 @@ The markdown file should be structured as follows:
 
 ## APIs / Interfaces
 - `[Function/Endpoint Signature]`: [Description of inputs/outputs]
+
+## Infrastructure & Deployment
+[Decisions on Cloud, IaC tools like Terraform/AWS CDK, Docker, databases, etc.]
 ```

@@ -10,11 +10,12 @@ DevHive is composed of specialized Agent Skills that work sequentially:
 
 1. **`devhive-explorer`**: Analyzes the request and writes `.devhive/specs/01-exploration.md`
 2. **`devhive-proposal`**: Creates acceptance criteria in `02-proposal.md`
-3. **`devhive-architect`**: Designs the system architecture in `03-architecture.md`
-4. **`devhive-taskplanner`**: Breaks the architecture into actionable items in `04-tasks.md`
-5. **`devhive-developer`**: Writes the actual code and checks off tasks in `04-tasks.md`
-6. **`devhive-qa`**: Writes test cases and test plans in `05-qa-plan.md`
-7. **`devhive-auditor`**: Performs a final check and writes `06-audit.md`
+3. **`devhive-architect`**: Designs the system architecture and cloud infrastructure in `03-architecture.md`
+4. **`devhive-taskplanner`**: Breaks the architecture into actionable items, separating infrastructure and application code in `04-tasks.md`
+5. **`devhive-devops`**: Writes Infrastructure as Code (IaC) (Terraform, CDK, Docker) and checks off `## Infrastructure Tasks` in `04-tasks.md`
+6. **`devhive-developer`**: Writes the actual business logic and checks off `## Application Tasks` in `04-tasks.md`
+7. **`devhive-qa`**: Writes test cases and test plans in `05-qa-plan.md`
+8. **`devhive-auditor`**: Performs a final check and writes `06-audit.md`
 
 All of this is managed by the **`devhive-orchestrator`** skill.
 
@@ -31,10 +32,10 @@ To use DevHive in your OpenCode environment, run the install script. It will cop
 Instead of using OpenCode as a general assistant, invoke the dedicated `@devhive` agent. This agent is hardwired to immediately start the SDD pipeline.
 
 ```
-@devhive Build a script that converts CSV to JSON.
+@devhive Build a script that converts CSV to JSON running on AWS Lambda.
 ```
 
-The agent will automatically load the orchestrator skill and start the 7-phase pipeline!
+The agent will automatically load the orchestrator skill and start the 8-phase pipeline!
 
 ### Continuous Mode
 By default, the orchestrator will pause and ask for your approval after writing each specification file (e.g., after writing the architecture design). If you want it to run entirely autonomously without stopping, you can add the "continuous mode" flag to your prompt:

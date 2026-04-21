@@ -1,6 +1,6 @@
 ---
 name: devhive-taskplanner
-description: Breaks down the architecture into actionable development tasks.
+description: Breaks down the architecture into actionable development and infrastructure tasks.
 ---
 
 # DevHive TaskPlanner Skill
@@ -12,10 +12,10 @@ When the orchestrator assigns you the task planning phase after the architecture
 Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`.
 
 ## Playbook (What to Do)
-1. **Review Context**: Understand the architectural components and the acceptance criteria.
-2. **Define Epics**: Group related work into high-level epics (e.g., "Database Models", "UI Implementation").
-3. **Extract Tasks**: Write specific, actionable, and granular tasks for the developer. Each task should mention the files involved if known.
-4. **Sequence Tasks**: Order the tasks logically (e.g., backend before frontend, core logic before UI).
+1. **Review Context**: Understand the architectural components, infrastructure needs, and the acceptance criteria.
+2. **Define Infrastructure Tasks**: If the architecture requires new databases, Terraform, Docker files, CI/CD pipelines, or cloud resources, define these as specific tasks.
+3. **Define Application Tasks**: Write specific, actionable, and granular tasks for the software developer (e.g., API endpoints, UI components, logic). Each task should mention the files involved if known.
+4. **Format the Output**: Ensure you strictly separate the output into `## Infrastructure Tasks` and `## Application Tasks`.
 
 ## Output
 You MUST use the `Write` tool to save your plan to `.devhive/specs/04-tasks.md`.
@@ -28,13 +28,14 @@ The markdown file should be structured as follows:
 ## Executive Summary
 [1-3 sentences summarizing the execution plan]
 
-## Epics
-- [Epic 1]
-- [Epic 2]
-
-## Tasks
+## Infrastructure Tasks
 - [ ] **Task 1: [Name]**
-  - Description: [What needs to be done]
+  - Description: [What infrastructure needs to be provisioned (e.g., Dockerfile, Terraform for RDS)]
+  - Files: [Files to modify/create]
+
+## Application Tasks
+- [ ] **Task 1: [Name]**
+  - Description: [What logic needs to be implemented]
   - Files: [Files to modify/create]
 - [ ] **Task 2: [Name]**
   - Description: [What needs to be done]
