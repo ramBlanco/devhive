@@ -12,6 +12,7 @@ When the orchestrator assigns you the performance testing phase.
 Read `.devhive/specs/04-tasks.md`, `.devhive/specs/03-architecture.md`, and the project's `GUIDELINES.md` if it exists. Assume the backend and frontend are built.
 
 ## Playbook (What to Do)
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `load-testing-expert`.
 1. **Review Tasks**: Look at the unchecked `[ ]` tasks strictly under the `## Performance Tasks` section in `04-tasks.md`. Ignore any other sections.
 2. **Performance Scope**: You are responsible for designing and writing load, stress, and spike test scripts (using k6, Artillery, JMeter, or a similar tool). Focus on critical API endpoints, database queries, and high-traffic frontend paths. You are not executing the tests in production, but you are creating the scripts and test data for CI/CD integration.
 3. **Adhere to Guidelines**: ALWAYS read `GUIDELINES.md` in the project root (if it exists) to ensure you use the correct performance testing framework.

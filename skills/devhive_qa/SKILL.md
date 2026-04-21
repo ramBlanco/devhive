@@ -12,6 +12,7 @@ When the orchestrator assigns you the QA phase after development and SAST are co
 Read `.devhive/specs/02-proposal.md` (for acceptance criteria), `GUIDELINES.md` if it exists, and review the code written by the developers.
 
 ## Playbook (What to Do)
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `test-driven-development`, `qa-automation-expert`.
 1. **Review Implementation**: Look at the code changes made. Read the acceptance criteria in `02-proposal.md`.
 2. **Create Strategy**: Define how you will test the new feature (unit tests, integration tests).
 3. **Write & Run Tests**: Use the `Write` or `Edit` tools to create actual test files in the codebase, following the project's testing framework (from `GUIDELINES.md`). Run the tests using the `Bash` tool to ensure they actually test the implementation correctly.
