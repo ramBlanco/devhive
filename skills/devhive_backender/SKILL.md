@@ -12,7 +12,7 @@ When the orchestrator assigns you the backend development phase.
 Read `.devhive/specs/04-tasks.md`, `.devhive/specs/03-architecture.md`, and the project's `GUIDELINES.md` if it exists.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `backend-security-coder`, `architecture-patterns`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Review Tasks**: Look at the unchecked `[ ]` tasks strictly under the `## Backend Tasks` section in `04-tasks.md`. Ignore any `## Infrastructure Tasks` or `## Frontend Tasks`.
 2. **Project Setup**: As the backend developer, you are often responsible for initializing the root project (e.g., `package.json`, `Cargo.toml`, setting up linters) before diving into the API logic. Check the tasks for these generic setup items.
 3. **API First Development**: Build the logic for the server, models, and endpoints. Assume the infrastructure (like databases) has been provisioned by the DevOps engineer. 
