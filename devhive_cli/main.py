@@ -1,0 +1,79 @@
+import os
+import shutil
+import subprocess
+from pathlib import Path
+import click
+
+# Paths configuration
+CLI_DIR = Path(__file__).resolve().parent
+ROOT_DIR = CLI_DIR.parent
+LOCAL_SKILLS_DIR = ROOT_DIR / "skills"
+COMMUNITY_SKILLS_DIR = ROOT_DIR / "community_skills"
+TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
+
+@click.group()
+def cli():
+    """DevHive CLI for managing AI agent skills."""
+    pass
+
+def sync_local_skills(clean=False):
+    if not TARGET_DIR.exists():
+        TARGET_DIR.mkdir(parents=True, exist_ok=True)
+        click.secho(f"Created target directory: {TARGET_DIR}", fg="green")
+    
+    for src_dir in [LOCAL_SKILLS_DIR, COMMUNITY_SKILLS_DIR]:
+        if not src_dir.exists():
+            click.secho(f"Warning: Source directory {src_dir} not found.", fg="yellow")
+            continue
+        
+        click.secho(f"\nSyncing from {src_dir.name}...", fg="cyan", bold=True)
+        for skill_path in src_dir.iterdir():
+            if skill_path.is_dir():
+                target_skill_path = TARGET_DIR / skill_path.name
+                
+                # If cleaning, remove existing before copying
+                if clean and target_skill_path.exists():
+                    shutil.rmtree(target_skill_path)
+                    click.secho(f"Cleaned existing: {skill_path.name}", fg="yellow")
+                
+                if not target_skill_path.exists():
+                    shutil.copytree(skill_path, target_skill_path)
+                    click.secho(f"Installed: {skill_path.name}", fg="green")
+                else:
+                    # Update existing (removing first to avoid partial overrides)
+                    shutil.rmtree(target_skill_path)
+                    shutil.copytree(skill_path, target_skill_path)
+                    click.secho(f"Updated: {skill_path.name}", fg="blue")
+
+def install_remote_skills():
+    click.secho("\nInstalling official remote skills via npx...", fg="cyan", bold=True)
+    commands = [
+        ["npx", "--yes", "skills", "add", "https://github.com/shadcn/ui", "--skill", "shadcn", "-y", "--global"],
+        ["npx", "--yes", "skills", "add", "https://github.com/supercent-io/skills-template", "--skill", "responsive-design", "-y", "--global"]
+    ]
+    
+    for cmd in commands:
+        click.secho(f"Running: {' '.join(cmd)}", fg="magenta")
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            click.secho(f"Error installing remote skill: {e}", fg="red")
+
+@cli.command()
+def install():
+    """Install all devhive and community skills."""
+    click.secho("Starting DevHive Skills Installation...", fg="green", bold=True)
+    sync_local_skills(clean=False)
+    install_remote_skills()
+    click.secho("\nInstallation Complete! 🎉", fg="green", bold=True)
+
+@cli.command()
+def update_skill():
+    """Update all skills (cleans existing ones and reinstalls)."""
+    click.secho("Updating DevHive Skills...", fg="blue", bold=True)
+    sync_local_skills(clean=True)
+    install_remote_skills()
+    click.secho("\nUpdate Complete! 🚀", fg="green", bold=True)
+
+if __name__ == "__main__":
+    cli()
