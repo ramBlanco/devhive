@@ -1,5 +1,5 @@
 #!/bin/bash
-# Sync Community Skills to OpenCode configuration
+# Sync Community Skills and Remote Skills to OpenCode configuration
 
 CONFIG_DIR=~/.config/opencode
 SKILLS_DIR="$CONFIG_DIR/skills"
@@ -16,4 +16,19 @@ if [ -d "community_skills" ]; then
     echo "Community skills synced successfully."
 else
     echo "Warning: community_skills directory not found."
+fi
+
+echo "Installing official remote skills via skills.sh..."
+# Install shadcn skill using non-interactive flags
+npx --yes skills add https://github.com/shadcn/ui --skill shadcn -y
+
+npx --yes skills add https://github.com/supercent-io/skills-template --skill responsive-design -y
+
+# Ensure the downloaded skill is explicitly copied to the opencode directory
+if [ -d "$HOME/.agents/skills/shadcn" ]; then
+    echo "Copying shadcn skill to OpenCode..."
+    cp -r "$HOME/.agents/skills/shadcn" "$SKILLS_DIR/"
+    echo "Remote skills installed and synced successfully."
+else
+    echo "Warning: shadcn skill was not found in ~/.agents/skills/shadcn."
 fi
