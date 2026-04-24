@@ -12,7 +12,7 @@ When the orchestrator assigns you the frontend development phase after backend i
 Read `.devhive/specs/04-tasks.md`, `.devhive/specs/03-architecture.md`, and the project's `GUIDELINES.md` if it exists.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `responsive-design-expert`, `clean-code`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `frontend-design`. If the project uses shadcn/ui, you MUST load the `shadcn` skill. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Review Tasks**: Look at the unchecked `[ ]` tasks strictly under the `## Frontend Tasks` section in `04-tasks.md`. Ignore any `## Infrastructure Tasks` or `## Backend Tasks`.
 2. **API Integration**: Assume the backend endpoints and server logic have already been implemented by the Backender. You are building the client side (React, Vue, HTML/CSS/JS) to consume them. Handle loading states, errors, and UI interactions properly.
 3. **Design & UX**: Focus on UI/UX, responsive design, component modularity, and client-side state management.

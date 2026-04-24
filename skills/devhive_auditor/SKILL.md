@@ -12,7 +12,7 @@ When the orchestrator assigns you the audit phase as the final check.
 Read all specs from `.devhive/specs/` and review the final codebase state.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `code-quality-auditor`, `compliance-checker`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Consistency Check**: Verify that the implemented code matches the architecture (`03-architecture.md`) and proposal (`02-proposal.md`).
 2. **Security & Quality Audit**: Search for potential vulnerabilities, hardcoded secrets, or poor error handling.
 3. **Completeness Check**: Ensure all acceptance criteria are met and all tasks are completed.

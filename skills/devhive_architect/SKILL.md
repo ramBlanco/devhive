@@ -12,7 +12,7 @@ When the orchestrator assigns you the architecture phase after the proposal is c
 Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `system-design-expert`, `cloud-architect`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Review Context**: Understand the scope and acceptance criteria from the proposal.
 2. **System Design**: Decide on the architectural pattern to use (e.g., MVC, specific design patterns, service layers) that aligns with the existing codebase.
 3. **Component Breakdown**: Identify the new components, classes, or modules that need to be created or modified.

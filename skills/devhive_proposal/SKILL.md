@@ -12,7 +12,7 @@ When the orchestrator assigns you the proposal phase after exploration is comple
 Read the `.devhive/specs/01-exploration.md` file to understand the exploration findings.
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `agile-user-stories`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
 1. **Review Context**: Read the exploration analysis thoroughly.
 2. **Define Value**: State clearly why the user needs this feature and what value it provides.
 3. **Define Scope**: Clearly mark what is IN scope and what is OUT of scope for this iteration.
