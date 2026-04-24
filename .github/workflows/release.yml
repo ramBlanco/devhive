@@ -80,7 +80,6 @@ jobs:
       - name: Set project version
         run: |
           sed -i 's/version=".*"/version="${{ needs.details.outputs.new_version }}"/' setup.py
-          sed -i 's/version = ".*"/version = "${{ needs.details.outputs.new_version }}"/' pyproject.toml
 
       - name: Install build tools and dependencies
         run: |
