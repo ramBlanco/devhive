@@ -20,9 +20,9 @@ fi
 
 echo "Installing official remote skills via skills.sh..."
 # Install shadcn skill using non-interactive flags
-npx --yes skills add https://github.com/shadcn/ui --skill shadcn -y
+npx --yes skills add https://github.com/shadcn/ui --skill shadcn -y --global
 
-npx --yes skills add https://github.com/supercent-io/skills-template --skill responsive-design -y
+npx --yes skills add https://github.com/supercent-io/skills-template --skill responsive-design -y --global
 
 # Ensure the downloaded skill is explicitly copied to the opencode directory
 if [ -d "$HOME/.agents/skills/shadcn" ]; then
