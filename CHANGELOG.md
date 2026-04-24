@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.23] - 2026-04-24
+
+### Changed
+- **Modularity Fix**: Updated the `devhive_taskplanner` prompt to clearly support skipping unneeded domains (e.g., skipping Backend for Frontend-only projects) by explicitly omitting checkboxes.
+
 ## [0.1.22] - 2026-04-24
 
 ### Added

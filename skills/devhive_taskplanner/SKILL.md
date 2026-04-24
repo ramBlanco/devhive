@@ -23,6 +23,7 @@ Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`.
 8. **Define Documentation Tasks**: Write tasks for the Tech Writer (e.g., update README, Swagger, OpenAPI specs).
 9. **Define Release Tasks**: Write tasks for the Release Manager (e.g., update package.json version, CHANGELOG.md, create local git tag).
 10. **Format the Output**: Ensure you strictly separate the output into the corresponding sections.
+11. **Empty Domains**: If a specific domain (e.g., Backend, Data, Infrastructure) is not needed for the project, DO NOT use checkboxes (`[ ]`). Instead, simply write "*None required*" under that section. This prevents the orchestrator from launching unnecessary agents.
 
 ## Output
 You MUST use the `Write` tool to save your plan to `.devhive/specs/04-tasks.md`.
@@ -36,30 +37,35 @@ The markdown file should be structured as follows:
 [1-3 sentences summarizing the execution plan]
 
 ## Design Tasks
+[If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [CSS vars, framework configuration]
   - Files: [Files to modify/create]
   - Skills: [Comma-separated list of suggested opencode skills, or None]
 
 ## Infrastructure Tasks
+[If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [What infrastructure needs to be provisioned]
   - Files: [Files to modify/create]
   - Skills: [Comma-separated list of suggested opencode skills, or None]
 
 ## Data Tasks
+[If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [Migrations, seeders, schema definitions]
   - Files: [Files to modify/create]
   - Skills: [Comma-separated list of suggested opencode skills, or None]
 
 ## Backend Tasks
+[If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [Initial project setup, API routes, server logic]
   - Files: [Files to modify/create]
   - Skills: [Comma-separated list of suggested opencode skills, or None]
 
 ## Frontend Tasks
+[If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [UI components, consuming backend APIs]
   - Files: [Files to modify/create]
