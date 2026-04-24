@@ -28,10 +28,20 @@ All of this is managed by the **`devhive-orchestrator`** skill.
 
 ## Installation
 
-To use DevHive in your OpenCode environment, run the install script. It will copy the skills and the `@devhive` agent profile into your local OpenCode configuration folder (`~/.config/opencode/`).
+DevHive is available as a Python package via PyPI. You can install it globally to manage your OpenCode skills across all your environments.
 
 ```bash
-./install.sh
+pip install devhive
+```
+
+Once installed, you can use the CLI to setup or update your DevHive environment:
+
+```bash
+# Install all official and community skills into OpenCode
+devhive install
+
+# Update your existing skills to the latest versions
+devhive update-skill
 ```
 
 ## Usage (The `@devhive` Agent)
