@@ -45,6 +45,9 @@ devhive update-skill
 
 # Initialize a modern Next.js/React frontend AI guidelines file in your current project
 devhive init-frontend
+
+# Initialize a Hexagonal Architecture backend AI guidelines file (Interactive Prompt)
+devhive init-backend
 ```
 
 ## Usage (The `@devhive` Agent)

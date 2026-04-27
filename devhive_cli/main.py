@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from pathlib import Path
 import click
+from devhive_cli.templates_backend import generate_backend_agents_md
 
 # Paths configuration
 CLI_DIR = Path(__file__).resolve().parent
@@ -92,6 +93,34 @@ def init_frontend():
         
     shutil.copy2(template_path, dest_path)
     click.secho("✅ Successfully created AGENTS.md with modern Next.js/React frontend guidelines!", fg="green", bold=True)
+
+@cli.command()
+def init_backend():
+    """Initialize a modern backend AGENTS.md template with Hexagonal Architecture."""
+    dest_path = Path.cwd() / "AGENTS.md"
+    
+    if dest_path.exists():
+        click.secho("AGENTS.md already exists in this directory. Aborting to prevent overwrite.", fg="yellow")
+        return
+
+    language = click.prompt("Which backend language?", type=click.Choice(['python', 'node']))
+    
+    use_di = False
+    if language == 'python':
+        framework = click.prompt("Which framework?", type=click.Choice(['fastapi', 'django', 'none']))
+    else:
+        framework = click.prompt("Which framework?", type=click.Choice(['express', 'nestjs', 'none']))
+        if framework != 'nestjs':
+            use_di = click.confirm("Do you want to use InversifyJS for Dependency Injection?")
+    
+    iac = click.prompt("Which IaC tool are you using?", type=click.Choice(['cdk', 'terraform', 'serverless']))
+    
+    md_content = generate_backend_agents_md(language, framework, iac, use_di)
+    
+    with open(dest_path, "w", encoding="utf-8") as f:
+        f.write(md_content)
+        
+    click.secho("✅ Successfully created AGENTS.md with Hexagonal Architecture guidelines!", fg="green", bold=True)
 
 if __name__ == "__main__":
     cli()
