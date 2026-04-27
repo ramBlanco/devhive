@@ -42,6 +42,9 @@ devhive install
 
 # Update your existing skills to the latest versions
 devhive update-skill
+
+# Initialize a modern Next.js/React frontend AI guidelines file in your current project
+devhive init-frontend
 ```
 
 ## Usage (The `@devhive` Agent)

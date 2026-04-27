@@ -9,6 +9,7 @@ CLI_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CLI_DIR.parent
 LOCAL_SKILLS_DIR = ROOT_DIR / "skills"
 COMMUNITY_SKILLS_DIR = ROOT_DIR / "community_skills"
+TEMPLATES_DIR = ROOT_DIR / "templates"
 TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
 
 @click.group()
@@ -74,6 +75,23 @@ def update_skill():
     sync_local_skills(clean=True)
     install_remote_skills()
     click.secho("\nUpdate Complete! 🚀", fg="green", bold=True)
+
+@cli.command()
+def init_frontend():
+    """Initialize a modern frontend AGENTS.md template in the current directory."""
+    template_path = TEMPLATES_DIR / "AGENTS.frontend.md"
+    dest_path = Path.cwd() / "AGENTS.md"
+    
+    if not template_path.exists():
+        click.secho("Error: Frontend template not found in the devhive package.", fg="red")
+        return
+        
+    if dest_path.exists():
+        click.secho("AGENTS.md already exists in this directory. Aborting to prevent overwrite.", fg="yellow")
+        return
+        
+    shutil.copy2(template_path, dest_path)
+    click.secho("✅ Successfully created AGENTS.md with modern Next.js/React frontend guidelines!", fg="green", bold=True)
 
 if __name__ == "__main__":
     cli()
