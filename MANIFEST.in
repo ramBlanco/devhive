@@ -1,5 +1,5 @@
-recursive-include skills *
-recursive-include community_skills *
-recursive-include templates *
-recursive-include agents *
+recursive-include devhive_cli/skills *
+recursive-include devhive_cli/community_skills *
+recursive-include devhive_cli/templates *
+recursive-include devhive_cli/agents *
 

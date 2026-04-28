@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.28] - 2026-04-28
+
+### Fixed
+- **PyPI Packaging Issue**: Moved static asset directories (`skills/`, `community_skills/`, `agents/`, `templates/`) into the `devhive_cli` Python module. This ensures that `setuptools` correctly bundles these files into the distributed `.whl` package on PyPI, fixing the bug where `devhive install` could not find them on user machines (e.g., on macOS).
+
 ## [0.1.27] - 2026-04-28
 
 ### Added

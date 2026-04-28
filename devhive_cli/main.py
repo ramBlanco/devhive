@@ -7,11 +7,10 @@ from devhive_cli.templates_backend import generate_backend_agents_md
 
 # Paths configuration
 CLI_DIR = Path(__file__).resolve().parent
-ROOT_DIR = CLI_DIR.parent
-LOCAL_SKILLS_DIR = ROOT_DIR / "skills"
-COMMUNITY_SKILLS_DIR = ROOT_DIR / "community_skills"
-TEMPLATES_DIR = ROOT_DIR / "templates"
-LOCAL_AGENTS_DIR = ROOT_DIR / "agents"
+LOCAL_SKILLS_DIR = CLI_DIR / "skills"
+COMMUNITY_SKILLS_DIR = CLI_DIR / "community_skills"
+TEMPLATES_DIR = CLI_DIR / "templates"
+LOCAL_AGENTS_DIR = CLI_DIR / "agents"
 TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
 TARGET_AGENTS_DIR = Path.home() / ".config" / "opencode" / "agents"
 
