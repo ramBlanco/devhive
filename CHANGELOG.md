@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.27] - 2026-04-28
+
+### Added
+- **Agent Installation**: `devhive install` and `devhive update-skill` now automatically sync the `@devhive` agent definition file to the OpenCode `~/.config/opencode/agents/` global directory.
+- **Agent Prompt Enhancement**: Rewrote the `@devhive` agent prompt to enforce stricter lifecycle management (zero chatter), proactive execution of the `devhive-orchestrator` skill, and proper handling of "continuous mode".
+
+### Removed
+- **Responsive Design Skill**: Removed the remote installation of the `responsive-design` skill via npx, as the repository is no longer available.
+
 ## [0.1.26] - 2026-04-27
 
 ### Changed

@@ -1,4 +1,5 @@
 recursive-include skills *
 recursive-include community_skills *
 recursive-include templates *
+recursive-include agents *
 

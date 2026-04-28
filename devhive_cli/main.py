@@ -11,7 +11,9 @@ ROOT_DIR = CLI_DIR.parent
 LOCAL_SKILLS_DIR = ROOT_DIR / "skills"
 COMMUNITY_SKILLS_DIR = ROOT_DIR / "community_skills"
 TEMPLATES_DIR = ROOT_DIR / "templates"
+LOCAL_AGENTS_DIR = ROOT_DIR / "agents"
 TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
+TARGET_AGENTS_DIR = Path.home() / ".config" / "opencode" / "agents"
 
 @click.group()
 def cli():
@@ -47,11 +49,24 @@ def sync_local_skills(clean=False):
                     shutil.copytree(skill_path, target_skill_path)
                     click.secho(f"Updated: {skill_path.name}", fg="blue")
 
+def sync_local_agents():
+    if not TARGET_AGENTS_DIR.exists():
+        TARGET_AGENTS_DIR.mkdir(parents=True, exist_ok=True)
+    
+    if not LOCAL_AGENTS_DIR.exists():
+        click.secho(f"Warning: Source directory {LOCAL_AGENTS_DIR} not found.", fg="yellow")
+        return
+        
+    click.secho(f"\nSyncing agents from {LOCAL_AGENTS_DIR.name}...", fg="cyan", bold=True)
+    for agent_file in LOCAL_AGENTS_DIR.glob("*.md"):
+        target_file = TARGET_AGENTS_DIR / agent_file.name
+        shutil.copy2(agent_file, target_file)
+        click.secho(f"Installed agent: {agent_file.name}", fg="green")
+
 def install_remote_skills():
     click.secho("\nInstalling official remote skills via npx...", fg="cyan", bold=True)
     commands = [
         ["npx", "--yes", "skills", "add", "https://github.com/shadcn/ui", "--skill", "shadcn", "-y", "--global"],
-        ["npx", "--yes", "skills", "add", "https://github.com/supercent-io/skills-template", "--skill", "responsive-design", "-y", "--global"]
     ]
     
     for cmd in commands:
@@ -66,6 +81,7 @@ def install():
     """Install all devhive and community skills."""
     click.secho("Starting DevHive Skills Installation...", fg="green", bold=True)
     sync_local_skills(clean=False)
+    sync_local_agents()
     install_remote_skills()
     click.secho("\nInstallation Complete! 🎉", fg="green", bold=True)
 
@@ -74,6 +90,7 @@ def update_skill():
     """Update all skills (cleans existing ones and reinstalls)."""
     click.secho("Updating DevHive Skills...", fg="blue", bold=True)
     sync_local_skills(clean=True)
+    sync_local_agents()
     install_remote_skills()
     click.secho("\nUpdate Complete! 🚀", fg="green", bold=True)
 
