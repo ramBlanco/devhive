@@ -1,4 +1,7 @@
-def generate_backend_agents_md(language: str, framework: str, iac: str, use_di: bool) -> str:
+import os
+from pathlib import Path
+
+def generate_backend_agents_md(template_path: Path, language: str, framework: str, iac: str, use_di: bool) -> str:
     stack_list = []
     if language == 'python':
         stack_list.append("- **Language**: Python 3.10+ (Strict Type Hinting)")
@@ -29,73 +32,21 @@ def generate_backend_agents_md(language: str, framework: str, iac: str, use_di: 
         stack_list.append("- **Infrastructure as Code**: Serverless Framework")
 
     stack_section = "\n".join(stack_list)
+    iac_tool_upper = iac.upper()
 
-    # Base structure
-    md = f"""# Backend Architecture & AI Agent Guidelines
-
-This `AGENTS.md` (or `GUIDELINES.md`) file serves as the strict instruction manual for OpenCode and DevHive agents. It defines the technical stack, architectural patterns, and coding conventions for this backend project.
-
-## 🛠️ 1. Tech Stack
-{stack_section}
-
-## 🧠 2. OpenCode Skills to Load
-Agents **MUST** load the following specialized skills before executing tasks:
-- `architecture-patterns`: For maintaining clean separation of concerns and Hexagonal Architecture.
-- `backend-architect`: For scalable API design and domain modeling.
-- `backend-security-coder`: For secure coding practices, input validation, and auth.
-- `devhive-devops`: For {iac.upper()} infrastructure setup.
-
-## 📂 3. Project Structure (Hexagonal Architecture)
-For maximum scalability, testability, and maintainability, the project MUST strictly follow Hexagonal Architecture (Ports & Adapters).
-
-```text
-src/
-├── domain/             # ENTERPRISE BUSINESS RULES (No external dependencies)
-│   ├── entities/       # Pure domain models
-│   └── exceptions/     # Domain-specific errors
-├── application/        # APPLICATION BUSINESS RULES (Use Cases & Ports)
-│   ├── use_cases/      # Orchestrates domain logic
-│   └── ports/          # Interfaces for outbound communication (Repositories, External APIs)
-├── infrastructure/     # ADAPTERS (Database, External Services, Third-party libs)
-│   ├── database/       # Concrete implementation of repository ports
-│   └── di/             # Dependency Injection container/setup
-└── presentation/       # ENTRY POINTS (Controllers, REST APIs, GraphQL, Lambdas)
-    └── controllers/    # Parses HTTP requests and calls use cases
-
-infrastructure/         # IaC DEFINITIONS (Outside src/)
-└── # {iac.upper()} configurations
-```
-
-## 📐 4. Architectural Rules & Clean Code (CRITICAL)
-
-1. **The Dependency Rule**: Source code dependencies MUST only point inward, toward the `domain/`. 
-   - `domain/` knows nothing about anything else.
-   - `application/` depends only on `domain/`.
-   - `infrastructure/` and `presentation/` depend on `application/` and `domain/`.
-   - **Never import an infrastructure detail (like a DB model) into a use case.**
-
-2. **Ports and Adapters**:
-   - Outbound communication (like DB queries) MUST be defined as an interface (Port) in the `application/` layer.
-   - The actual database logic MUST be implemented as an Adapter in the `infrastructure/` layer.
-
-3. **Dependency Injection**:
-   - Use Cases must receive their dependencies (Ports) via constructor injection.
-   - The Presentation layer resolves these dependencies and passes them to the Use Cases.
-"""
-
+    di_rules = ""
     if language == 'node' and use_di:
-        md += """
+        di_rules = """
 4. **InversifyJS Usage**:
    - Decorate concrete adapters in `infrastructure/` with `@injectable()`.
    - Bind interfaces to symbols in an `inversify.config.ts` container file.
    - Use the container in the `presentation/` layer to resolve use cases.
 """
 
-    md += "\n## 💻 5. Code Examples\n\n"
-
+    code_examples = ""
     if language == 'python':
         if framework == 'fastapi':
-            md += """### Example: FastAPI + Hexagonal Architecture
+            code_examples = """### Example: FastAPI + Hexagonal Architecture
 
 **1. Port (Application Layer)**
 *File: `src/application/ports/user_repository.py`*
@@ -165,7 +116,7 @@ def get_user(user_id: str, use_case: GetUserUseCase = Depends(get_user_use_case)
 ```
 """
         elif framework == 'django':
-            md += """### Example: Django + Hexagonal Architecture
+            code_examples = """### Example: Django + Hexagonal Architecture
 
 **Note on Django**: Do NOT put business logic in Django Views or Models. Use Django ONLY as the `infrastructure/` and `presentation/` layers.
 
@@ -217,7 +168,7 @@ def get_user_view(request, user_id: str):
 ```
 """
         else:
-            md += """### Example: Pure Python + Hexagonal Architecture
+            code_examples = """### Example: Pure Python + Hexagonal Architecture
 
 **1. Port (Application Layer)**
 *File: `src/application/ports/user_repository.py`*
@@ -262,7 +213,7 @@ def lambda_handler(event, context):
 """
     else: # Node.js
         if use_di:
-            md += """### Example: Node.js + TypeScript + InversifyJS
+            code_examples = """### Example: Node.js + TypeScript + InversifyJS
 
 **1. Port (Application Layer)**
 *File: `src/application/ports/IUserRepository.ts`*
@@ -356,7 +307,7 @@ export class UserController {
 ```
 """
         else:
-            md += """### Example: Node.js + TypeScript (Manual DI)
+            code_examples = """### Example: Node.js + TypeScript (Manual DI)
 
 **1. Port (Application Layer)**
 *File: `src/application/ports/IUserRepository.ts`*
@@ -420,5 +371,13 @@ export class UserController {
 }
 ```
 """
+
+    with open(template_path, 'r', encoding='utf-8') as f:
+        md = f.read()
+
+    md = md.replace("{{TECH_STACK}}", stack_section)
+    md = md.replace("{{IAC_TOOL}}", iac_tool_upper)
+    md = md.replace("{{DI_RULES}}", di_rules)
+    md = md.replace("{{CODE_EXAMPLES}}", code_examples)
 
     return md

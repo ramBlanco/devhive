@@ -115,7 +115,12 @@ def init_backend():
     
     iac = click.prompt("Which IaC tool are you using?", type=click.Choice(['cdk', 'terraform', 'serverless']))
     
-    md_content = generate_backend_agents_md(language, framework, iac, use_di)
+    template_path = TEMPLATES_DIR / "AGENTS.backend.md"
+    if not template_path.exists():
+        click.secho("Error: Backend template not found in the devhive package.", fg="red")
+        return
+
+    md_content = generate_backend_agents_md(template_path, language, framework, iac, use_di)
     
     with open(dest_path, "w", encoding="utf-8") as f:
         f.write(md_content)
