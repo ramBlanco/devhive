@@ -8,8 +8,9 @@ It replaces complex background servers and in-memory states with a transparent, 
 
 DevHive is composed of specialized Agent Skills that work sequentially:
 
-1. **`devhive-explorer`**: Analyzes the request and writes `.devhive/specs/01-exploration.md`
-2. **`devhive-proposal`**: Creates acceptance criteria in `02-proposal.md`
+0. **`devhive-prd`**: Acts as a Product Manager. Writes or updates a Master `docs/PRODUCT_REQUIREMENTS.md` and generates a feature-specific `.devhive/specs/00-prd.md` before any technical work begins.
+1. **`devhive-explorer`**: Analyzes the PRD and codebase, then writes `.devhive/specs/01-exploration.md`
+2. **`devhive-proposal`**: Creates technical acceptance criteria in `02-proposal.md`
 3. **`devhive-architect`**: Designs the system architecture, DB schemas, and UX/UI design system in `03-architecture.md`
 4. **`devhive-taskplanner`**: Breaks the architecture into actionable items across 8 different domains in `04-tasks.md`
 5. **`devhive-designer`**: Implements the base UI/UX configuration (CSS vars, Tailwind configs) under `## Design Tasks`
@@ -58,7 +59,7 @@ Instead of using OpenCode as a general assistant, invoke the dedicated `@devhive
 @devhive Build a script that converts CSV to JSON running on AWS Lambda.
 ```
 
-The agent will automatically load the orchestrator skill and start the 10-phase pipeline!
+The agent will automatically load the orchestrator skill and start the 11-phase pipeline!
 
 ### Continuous Mode
 By default, the orchestrator will pause and ask for your approval after writing each specification file (e.g., after writing the architecture design). If you want it to run entirely autonomously without stopping, you can add the "continuous mode" flag to your prompt:

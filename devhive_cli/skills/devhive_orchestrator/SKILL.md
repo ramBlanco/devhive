@@ -10,6 +10,7 @@ This skill is the CEO/Orchestrator for the DevHive Skill-Driven Development (SDD
 
 ## The Pipeline
 The typical SDD pipeline consists of the following phases and their corresponding output files:
+0. `devhive-prd` -> `00-prd.md` (and updates `docs/PRODUCT_REQUIREMENTS.md`)
 1. `devhive-explorer` -> `01-exploration.md`
 2. `devhive-proposal` -> `02-proposal.md`
 3. `devhive-architect` -> `03-architecture.md`
@@ -28,8 +29,13 @@ The typical SDD pipeline consists of the following phases and their correspondin
 
 ## Playbook (Execution Loop)
 
-1. **Check State**: Look at the files in `.devhive/specs/`. Determine what the next missing phase is. If no files exist, the next phase is `exploration`.
+1. **Check State**: Look at the files in `.devhive/specs/`. Determine what the next missing phase is. If no files exist, the next phase is `prd`.
 2. **Determine Sub-Skill**: Based on the missing phase, decide which skill to invoke.
+   - If `00-prd.md` does not exist -> Invoke `devhive-prd`.
+   - If `00-prd.md` exists but `01-exploration.md` does not -> Invoke `devhive-explorer`.
+   - If `01-exploration.md` exists but `02-proposal.md` does not -> Invoke `devhive-proposal`.
+   - If `02-proposal.md` exists but `03-architecture.md` does not -> Invoke `devhive-architect`.
+   - If `03-architecture.md` exists but `04-tasks.md` does not -> Invoke `devhive-taskplanner`.
    - If `04-tasks.md` exists but `05-sast-report.md` does not, check `04-tasks.md` sequentially:
      - Are there unchecked tasks `[ ]` under `## Design Tasks`? -> Invoke `devhive-designer`.
      - Else, are there unchecked tasks `[ ]` under `## Infrastructure Tasks`? -> Invoke `devhive-devops`.
