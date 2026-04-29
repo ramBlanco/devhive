@@ -66,6 +66,7 @@ def install_remote_skills():
     click.secho("\nInstalling official remote skills via npx...", fg="cyan", bold=True)
     commands = [
         ["npx", "--yes", "skills", "add", "https://github.com/shadcn/ui", "--skill", "shadcn", "-y", "--global"],
+        ["npx", "--yes", "skills", "add", "https://github.com/github/awesome-copilot", "--skill", "prd", "-y", "--global"]
     ]
     
     for cmd in commands:

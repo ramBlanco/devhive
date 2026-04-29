@@ -14,6 +14,12 @@ You must handle a **Hybrid PRD Approach**:
 
 ## Execution Flow
 
+0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+
+
+Skills: 
+  - prd
+
 1. **Check for the Master PRD (`docs/PRODUCT_REQUIREMENTS.md`)**
    - If the file DOES NOT exist:
      - You must perform "Reverse Engineering". Use tools like `glob` and `read` to scan the current codebase (package.json, main application entry points, database schemas, etc.) to understand what the project is.
