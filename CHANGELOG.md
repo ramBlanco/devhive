@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.30] - 2026-04-29
+
+### Added
+- **Remote PRD Skill**: Integrated the `awesome-copilot` PRD skill as a remote dependency (installed via `npx`). The `devhive-prd` agent now automatically invokes this remote skill to leverage the official GitHub PRD formatting guidelines.
+
 ## [0.1.29] - 2026-04-29
 
 ### Added
