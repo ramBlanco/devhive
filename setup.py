@@ -8,7 +8,7 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="devhive",
-    version="0.1.30",
+    version="0.1.31",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
