@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.33] - 2026-04-29
+
+### Added
+- **Executive Summary Dashboard**: Enhanced the `devhive-orchestrator` completion phase. When the pipeline finishes, the orchestrator now automatically reads the SAST (`05-sast-report.md`) and Audit (`07-audit.md`) reports to present the user with a highly visible Markdown table summarizing security vulnerabilities and an overview of the auditor's findings (Pass/Fail status, architecture adherence) directly in the chat interface.
+
 ## [0.1.32] - 2026-04-29
 
 ### Changed

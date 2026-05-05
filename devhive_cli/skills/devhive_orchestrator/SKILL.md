@@ -56,4 +56,8 @@ The typical SDD pipeline consists of the following phases and their correspondin
    - Verify that the sub-agent successfully created the required `.devhive/specs/XX-name.md` file (or checked off tasks in `04-tasks.md`).
    - **Pause (Default Behavior)**: Stop and ask the user for approval. Show them the path of the newly created spec and ask if they want to proceed.
    - **Continuous Mode**: If the user explicitly requested "continuous mode", "no pauses", or if the project has a `.devhive/continuous` flag file, DO NOT STOP. Automatically proceed to step 1 to launch the next phase.
-5. **Completion**: The pipeline is complete when the Auditor finishes and writes `07-audit.md`. Inform the user that the project is successfully built.
+5. **Completion & Executive Summary**: The pipeline is complete when the Auditor finishes and writes `07-audit.md`. Instead of just saying "done", you MUST output an **Executive Summary** to the user.
+   - You MUST use the `Read` tool to extract data from `.devhive/specs/05-sast-report.md` and `.devhive/specs/07-audit.md`.
+   - **A. Security Summary**: Output a highly visible Markdown table summarizing the SAST findings. Columns: `Severity` | `Vulnerability Type` | `Affected File` | `Status/Recommendation`.
+   - **B. Audit Summary**: Output a brief summary of the auditor's findings. Include the overall "Pass/Fail" status, architecture adherence, and any critical technical debt.
+   - Conclude your message by informing the user that the project is successfully built, and remind them that full details are available in the `.devhive/specs/` directory.
