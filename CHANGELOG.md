@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.32] - 2026-04-29
+
+### Changed
+- **Strict Plan Ingestion**: Updated the core `devhive` agent and `devhive-orchestrator` to explicitly forbid skipping SDD phases. When a user provides a pre-made plan or detailed context, the agent will now ingest it as input and systematically run through all planning phases (`prd`, `explorer`, `proposal`, `architect`, `taskplanner`) to formalize the plan into `.devhive/specs/` artifacts instead of jumping straight to coding.
+
 ## [0.1.31] - 2026-04-29
 
 ### Changed

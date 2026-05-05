@@ -29,6 +29,8 @@ The typical SDD pipeline consists of the following phases and their correspondin
 
 ## Playbook (Execution Loop)
 
+**Strict Sequential Enforcement (CRITICAL):** NEVER skip a phase. Even if the user provides a highly detailed plan, architecture, or task list in their initial prompt, treat it ONLY as *input context*. You MUST still invoke the planning skills (`devhive-prd`, `devhive-explorer`, `devhive-proposal`, `devhive-architect`, `devhive-taskplanner`) sequentially. Instruct those sub-agents to ingest and adapt the user's plan into the official `.devhive/specs/` markdown files.
+
 1. **Check State**: Look at the files in `.devhive/specs/`. Determine what the next missing phase is. If no files exist, the next phase is `prd`.
 2. **Determine Sub-Skill**: Based on the missing phase, decide which skill to invoke.
    - If `00-prd.md` does not exist -> Invoke `devhive-prd`.
