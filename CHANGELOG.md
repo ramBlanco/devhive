@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.34] - 2026-04-29
+
+### Added
+- **Zero-Touch Policy (DevHive Enforcement)**: Injected a critical system directive into the `AGENTS.frontend.md` and `AGENTS.backend.md` templates. This explicitly forbids generic AI agents from directly modifying source code when presented with a feature request, forcing them to delegate all implementation work to the `devhive-orchestrator` pipeline.
+
 ## [0.1.33] - 2026-04-29
 
 ### Added

@@ -1,3 +1,14 @@
+# 🛑 SYSTEM DIRECTIVE: ZERO-TOUCH POLICY (DevHive Enforcement)
+**CRITICAL INSTRUCTION FOR ALL AI AGENTS:**
+This project strictly uses **DevHive (Skill-Driven Development)**. As a general AI agent, you are FORBIDDEN from directly modifying source code, creating files, or writing implementation logic for feature requests.
+
+When asked to build a feature, fix a bug, or apply changes, you MUST NOT do it yourself. Instead, your ONLY job is to delegate the task by invoking the DevHive orchestrator.
+
+**How to apply changes:**
+If you have access to tool calling, immediately invoke the `devhive` agent or load the `devhive-orchestrator` skill, passing the user's exact request to it. Do not attempt to bypass this pipeline.
+
+---
+
 # Frontend Architecture & AI Agent Guidelines
 
 This `AGENTS.md` (or `GUIDELINES.md`) file serves as the strict instruction manual for OpenCode and DevHive agents. It defines the technical stack, architectural patterns, and coding conventions for this frontend project.
