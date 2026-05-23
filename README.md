@@ -24,6 +24,7 @@ DevHive is composed of specialized Agent Skills that work sequentially:
 13. **`devhive-sast`**: Performs a Static Application Security Testing (SAST) scan and writes `05-sast-report.md`
 14. **`devhive-qa`**: Writes test cases and test plans in `06-qa-plan.md`
 15. **`devhive-auditor`**: Performs a final check and writes `07-audit.md`
+16. **`devhive-reflection`**: Extracts persistent memory (semantic, episodic, anti-patterns) to `.devhive/memory/` and writes `08-reflection.md`
 
 All of this is managed by the **`devhive-orchestrator`** skill.
 

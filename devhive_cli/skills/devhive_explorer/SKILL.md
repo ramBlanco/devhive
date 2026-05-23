@@ -9,7 +9,7 @@ description: Analyzes requirements, constraints, and dependencies for a new feat
 When the orchestrator assigns you the exploration phase for a feature request.
 
 ## Input Context
-You will read `.devhive/specs/00-prd.md` and `docs/PRODUCT_REQUIREMENTS.md` (if they exist) to understand the product requirements. You may also receive the user's initial request.
+You will read `.devhive/specs/00-prd.md` and `docs/PRODUCT_REQUIREMENTS.md` (if they exist) to understand the product requirements. You MUST also check for and read `.devhive/memory/semantic.md` and `.devhive/memory/anti_patterns.md` to ensure your exploration respects historical persistent memory constraints. You may also receive the user's initial request.
 
 ## Playbook (What to Do)
 0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.

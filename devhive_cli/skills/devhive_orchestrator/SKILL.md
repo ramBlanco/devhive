@@ -26,6 +26,7 @@ The typical SDD pipeline consists of the following phases and their correspondin
 13. `devhive-sast` -> performs security scan and writes `05-sast-report.md`
 14. `devhive-qa` -> writes tests and `06-qa-plan.md`
 15. `devhive-auditor` -> `07-audit.md`
+16. `devhive-reflection` -> generates persistent memory in `.devhive/memory/` and writes `08-reflection.md`
 
 ## Playbook (Execution Loop)
 
@@ -50,13 +51,14 @@ The typical SDD pipeline consists of the following phases and their correspondin
      - If ALL sections are fully `[x]`, proceed to `devhive-sast`.
    - If `05-sast-report.md` exists but `06-qa-plan.md` does not -> Invoke `devhive-qa`.
    - If `06-qa-plan.md` exists but `07-audit.md` does not -> Invoke `devhive-auditor`.
+   - If `07-audit.md` exists but `08-reflection.md` does not -> Invoke `devhive-reflection`.
 3. **Launch Task**: Use the `Task` tool (with `subagent_type="general"`) to launch the sub-agent.
-   - **Prompt**: Instruct the sub-agent to strictly follow its corresponding DevHive skill (e.g., "Use the `devhive-proposal` skill rules to complete your work based on the current context"). Pass the user's initial request or context if needed.
+   - **Prompt**: Instruct the sub-agent to strictly follow its corresponding DevHive skill. Instruct the sub-agent to read `.devhive/memory/` files (if they exist) for contextual constraints. If invoking `devhive-reflection`, you MUST pass a summary of the current chat history (human corrections and feedback) as input. Pass the user's initial request or context if needed.
 4. **Evaluate the Result**:
    - Verify that the sub-agent successfully created the required `.devhive/specs/XX-name.md` file (or checked off tasks in `04-tasks.md`).
    - **Pause (Default Behavior)**: Stop and ask the user for approval. Show them the path of the newly created spec and ask if they want to proceed.
    - **Continuous Mode**: If the user explicitly requested "continuous mode", "no pauses", or if the project has a `.devhive/continuous` flag file, DO NOT STOP. Automatically proceed to step 1 to launch the next phase.
-5. **Completion & Executive Summary**: The pipeline is complete when the Auditor finishes and writes `07-audit.md`. Instead of just saying "done", you MUST output an **Executive Summary** to the user.
+5. **Completion & Executive Summary**: The pipeline is complete when the Reflection agent finishes and writes `08-reflection.md`. Instead of just saying "done", you MUST output an **Executive Summary** to the user.
    - You MUST use the `Read` tool to extract data from `.devhive/specs/05-sast-report.md` and `.devhive/specs/07-audit.md`.
    - **A. Security Summary**: Output a highly visible Markdown table summarizing the SAST findings. Columns: `Severity` | `Vulnerability Type` | `Affected File` | `Status/Recommendation`.
    - **B. Audit Summary**: Output a brief summary of the auditor's findings. Include the overall "Pass/Fail" status, architecture adherence, and any critical technical debt.

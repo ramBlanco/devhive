@@ -9,7 +9,7 @@ description: Verifies project consistency, architecture adherence, and security.
 When the orchestrator assigns you the audit phase as the final check.
 
 ## Input Context
-Read all specs from `.devhive/specs/` and review the final codebase state.
+Read all specs from `.devhive/specs/` and review the final codebase state. You MUST also read `.devhive/memory/semantic.md` and `.devhive/memory/anti_patterns.md` (if they exist) to ensure the code does not violate persistent project rules or use known anti-patterns.
 
 ## Playbook (What to Do)
 0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.35] - 2026-04-29
+
+### Added
+- **Persistent Memory System (Phase 1)**: Transformed DevHive from a stateless orchestrator into a "Persistent Learning Agent Ecosystem". 
+  - Introduced the `devhive-reflection` skill (Phase 16) which runs at the end of each cycle to extract, score, and deduplicate learnings from execution and human feedback.
+  - Added semantic (`semantic.md`), episodic (`episodic.md`), and anti-pattern (`anti_patterns.md`) memory storage in the `.devhive/memory/` directory.
+  - Updated all planning agents (`explorer`, `architect`, `taskplanner`) to consume semantic and anti-pattern memories to enforce historical project constraints.
+  - Updated executor agents (`frontender`, `backender`) to consume episodic memory to avoid repeating bugs.
+  - Updated the orchestrator to inject chat history into the reflection agent for capturing human corrections.
+
 ## [0.1.34] - 2026-04-29
 
 ### Added
