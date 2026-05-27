@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.36] - 2026-04-29
+
+### Changed
+- **Zero-Touch Policy Injection**: Enhanced the `devhive init-frontend` and `devhive init-backend` commands. If an `AGENTS.md` file already exists, the CLI will now check if the Zero-Touch Policy is present. If it's missing, it will prompt the user with options to automatically inject the policy at the top of their existing file, overwrite it completely, or abort, ensuring legacy projects can easily adopt the DevHive enforcement rules without losing custom guidelines.
+
 ## [0.1.35] - 2026-04-29
 
 ### Added

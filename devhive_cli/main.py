@@ -1,5 +1,57 @@
 import os
 import shutil
+
+ZERO_TOUCH_POLICY = """# 🛑 SYSTEM DIRECTIVE: ZERO-TOUCH POLICY (DevHive Enforcement)
+**CRITICAL INSTRUCTION FOR ALL AI AGENTS:**
+This project strictly uses **DevHive (Skill-Driven Development)**. As a general AI agent, you are FORBIDDEN from directly modifying source code, creating files, or writing implementation logic for feature requests.
+
+When asked to build a feature, fix a bug, or apply changes, you MUST NOT do it yourself. Instead, your ONLY job is to delegate the task by invoking the DevHive orchestrator.
+
+**How to apply changes:**
+If you have access to tool calling, immediately invoke the `devhive` agent or load the `devhive-orchestrator` skill, passing the user's exact request to it. Do not attempt to bypass this pipeline.
+
+---
+"""
+
+
+def handle_existing_agents_md(dest_path: Path) -> bool:
+    """
+    Handles the case where AGENTS.md already exists.
+    Returns True if the caller should proceed to overwrite the file, False otherwise.
+    """
+    with open(dest_path, "r") as f:
+        content = f.read()
+        
+    if "ZERO-TOUCH POLICY" in content:
+        click.secho("AGENTS.md already exists and is up to date with DevHive policies.", fg="yellow")
+        return False
+        
+    click.secho("⚠️ AGENTS.md already exists, but it is missing the critical DevHive Zero-Touch Policy.", fg="yellow")
+    action = click.prompt(
+        "Do you want to:
+"
+        "  [i]nject the policy at the top (preserves your file)
+"
+        "  [o]verwrite the entire file with a new template
+"
+        "  [a]bort
+"
+        "Action",
+        type=click.Choice(['i', 'o', 'a'], case_sensitive=False)
+    )
+    
+    if action == 'i':
+        with open(dest_path, "w") as f:
+            f.write(ZERO_TOUCH_POLICY + "
+" + content)
+        click.secho("✅ Zero-Touch Policy injected successfully! Your existing content was preserved.", fg="green", bold=True)
+        return False
+    elif action == 'o':
+        return True
+    else:
+        click.secho("Aborted.", fg="yellow")
+        return False
+
 import subprocess
 from pathlib import Path
 import click
@@ -105,8 +157,8 @@ def init_frontend():
         return
         
     if dest_path.exists():
-        click.secho("AGENTS.md already exists in this directory. Aborting to prevent overwrite.", fg="yellow")
-        return
+        if not handle_existing_agents_md(dest_path):
+            return
         
     shutil.copy2(template_path, dest_path)
     click.secho("✅ Successfully created AGENTS.md with modern Next.js/React frontend guidelines!", fg="green", bold=True)
@@ -117,8 +169,8 @@ def init_backend():
     dest_path = Path.cwd() / "AGENTS.md"
     
     if dest_path.exists():
-        click.secho("AGENTS.md already exists in this directory. Aborting to prevent overwrite.", fg="yellow")
-        return
+        if not handle_existing_agents_md(dest_path):
+            return
 
     language = click.prompt("Which backend language?", type=click.Choice(['python', 'node']))
     
