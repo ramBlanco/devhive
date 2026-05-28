@@ -28,22 +28,17 @@ def handle_existing_agents_md(dest_path: Path) -> bool:
         
     click.secho("⚠️ AGENTS.md already exists, but it is missing the critical DevHive Zero-Touch Policy.", fg="yellow")
     action = click.prompt(
-        "Do you want to:
-"
-        "  [i]nject the policy at the top (preserves your file)
-"
-        "  [o]verwrite the entire file with a new template
-"
-        "  [a]bort
-"
+        "Do you want to:\n"
+        "  [i]nject the policy at the top (preserves your file)\n"
+        "  [o]verwrite the entire file with a new template\n"
+        "  [a]bort\n"
         "Action",
         type=click.Choice(['i', 'o', 'a'], case_sensitive=False)
     )
     
     if action == 'i':
         with open(dest_path, "w") as f:
-            f.write(ZERO_TOUCH_POLICY + "
-" + content)
+            f.write(ZERO_TOUCH_POLICY + "\n" + content)
         click.secho("✅ Zero-Touch Policy injected successfully! Your existing content was preserved.", fg="green", bold=True)
         return False
     elif action == 'o':
