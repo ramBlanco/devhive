@@ -1,5 +1,18 @@
 import os
 import shutil
+import subprocess
+from pathlib import Path
+import click
+from devhive_cli.templates_backend import generate_backend_agents_md
+
+# Paths configuration
+CLI_DIR = Path(__file__).resolve().parent
+LOCAL_SKILLS_DIR = CLI_DIR / "skills"
+COMMUNITY_SKILLS_DIR = CLI_DIR / "community_skills"
+TEMPLATES_DIR = CLI_DIR / "templates"
+LOCAL_AGENTS_DIR = CLI_DIR / "agents"
+TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
+TARGET_AGENTS_DIR = Path.home() / ".config" / "opencode" / "agents"
 
 ZERO_TOUCH_POLICY = """# 🛑 SYSTEM DIRECTIVE: ZERO-TOUCH POLICY (DevHive Enforcement)
 **CRITICAL INSTRUCTION FOR ALL AI AGENTS:**
@@ -46,20 +59,6 @@ def handle_existing_agents_md(dest_path: Path) -> bool:
     else:
         click.secho("Aborted.", fg="yellow")
         return False
-
-import subprocess
-from pathlib import Path
-import click
-from devhive_cli.templates_backend import generate_backend_agents_md
-
-# Paths configuration
-CLI_DIR = Path(__file__).resolve().parent
-LOCAL_SKILLS_DIR = CLI_DIR / "skills"
-COMMUNITY_SKILLS_DIR = CLI_DIR / "community_skills"
-TEMPLATES_DIR = CLI_DIR / "templates"
-LOCAL_AGENTS_DIR = CLI_DIR / "agents"
-TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
-TARGET_AGENTS_DIR = Path.home() / ".config" / "opencode" / "agents"
 
 @click.group()
 def cli():

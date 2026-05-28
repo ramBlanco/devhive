@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.38] - 2026-04-29
+
+### Fixed
+- **Import Resolution**: Fixed a `NameError` related to the `Path` object in `devhive_cli/main.py`. The imports (including `pathlib.Path`, `click`, etc.) were reorganized and hoisted to the absolute top of the file to ensure they are properly initialized before being utilized by the `handle_existing_agents_md` helper function.
+
 ## [0.1.37] - 2026-04-29
 
 ### Fixed
