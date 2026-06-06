@@ -9,7 +9,15 @@ description: Designs the technical architecture, components, data models, and in
 When the orchestrator assigns you the architecture phase after the proposal is complete.
 
 ## Input Context
-Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`. You MUST also check for and read `.devhive/memory/semantic.md` and `.devhive/memory/anti_patterns.md` to ensure your design does not violate historical architectural decisions or repeat past mistakes.
+Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md`, `.devhive/memory/anti_patterns.md` to ensure your design does not violate historical architectural decisions or repeat past mistakes.
+
+## Memory Access
+To search memory efficiently:
+1. First read `.devhive/memory/index.json` to see all memory entries
+2. Filter by tags relevant to your task (e.g., "architecture", "backend", "database", "security")
+3. Read only the specific memory files you need (don't load everything)
+4. Prioritize memories with score >= 0.7 for critical decisions
+5. Check for "architecture" and "convention" tagged memories to ensure design consistency
 
 ## Playbook (What to Do)
 0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `architecture-patterns`, `backend-architect`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.

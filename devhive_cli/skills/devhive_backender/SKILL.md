@@ -9,7 +9,15 @@ description: Implements the backend logic (APIs, databases, server setup) based 
 When the orchestrator assigns you the backend development phase.
 
 ## Input Context
-Read `.devhive/specs/04-tasks.md`, `.devhive/specs/03-architecture.md`, and the project's `GUIDELINES.md` if it exists. You MUST also read `.devhive/memory/episodic.md` (if it exists) to avoid repeating past backend errors.
+Read `.devhive/specs/04-tasks.md`, `.devhive/specs/03-architecture.md`, and the project's `GUIDELINES.md` if it exists. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/episodic.md` (if it exists) to avoid repeating past backend errors.
+
+## Memory Access
+To search memory efficiently:
+1. First read `.devhive/memory/index.json` to see all memory entries
+2. Filter by tags relevant to your task (e.g., "backend", "bug", "fix", "api")
+3. Read only the specific memory files you need (don't load everything)
+4. Prioritize memories with score >= 0.7 for critical decisions
+5. Check for "backend" and "bug" tagged episodic memories to avoid repeating past mistakes
 
 ## Playbook (What to Do)
 0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `backend-security-coder`, `architecture-patterns`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.

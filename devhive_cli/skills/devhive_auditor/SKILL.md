@@ -9,7 +9,15 @@ description: Verifies project consistency, architecture adherence, and security.
 When the orchestrator assigns you the audit phase as the final check.
 
 ## Input Context
-Read all specs from `.devhive/specs/` and review the final codebase state. You MUST also read `.devhive/memory/semantic.md` and `.devhive/memory/anti_patterns.md` (if they exist) to ensure the code does not violate persistent project rules or use known anti-patterns.
+Read all specs from `.devhive/specs/` and review the final codebase state. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md`, `.devhive/memory/anti_patterns.md` (if they exist) to ensure the code does not violate persistent project rules or use known anti-patterns.
+
+## Memory Access
+To search memory efficiently:
+1. First read `.devhive/memory/index.json` to see all memory entries
+2. Filter by tags relevant to your task (e.g., "security", "architecture", "anti-pattern", "quality")
+3. Read only the specific memory files you need (don't load everything)
+4. Prioritize memories with score >= 0.7 for critical decisions
+5. Check for "security" and "anti-pattern" tagged memories to ensure no violations
 
 ## Playbook (What to Do)
 0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.

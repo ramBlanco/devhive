@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.39] - 2026-06-05
+
+### Added
+- **Memory CLI System**: New `devhive memory` command group with full CRUD operations for managing persistent memory entries.
+  - `devhive memory list` - List all memory entries with ID, type, score, and tags
+  - `devhive memory show` - Show entries filtered by memory type
+  - `devhive memory search <query>` - Search memories by text or tags
+  - `devhive memory info <id>` - Show detailed info for a specific entry
+  - `devhive memory delete <id>` - Delete a memory entry
+  - `devhive memory stats` - Show memory statistics (counts, scores, tags)
+  - `devhive memory export` - Export memories to JSON file
+  - `devhive memory import` - Import memories from JSON file
+  - `devhive memory gc` - Garbage collect entries below score threshold
+
+- **Indexed Memory Architecture**: Memory entries now have unique IDs (sem-001, epi-001, ant-001) and are indexed in `.devhive/memory/index.json` for fast lookup and search.
+
+- **Memory Tag System**: Each memory entry now supports tags for filtering and categorization (architecture, backend, bug, fix, security, etc.).
+
+- **Updated Skills for Memory Access**: All memory-consuming skills (explorer, architect, taskplanner, backender, frontender, auditor) now have improved memory access patterns with tag-based filtering and index-first loading.
+
+- **devhive-reflection Enhanced**: The reflection skill now maintains the index.json and uses ID references when writing memories.
+
 ## [0.1.38] - 2026-04-29
 
 ### Fixed

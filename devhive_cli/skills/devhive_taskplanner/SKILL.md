@@ -9,7 +9,14 @@ description: Breaks down the architecture into actionable infrastructure, backen
 When the orchestrator assigns you the task planning phase after the architecture is designed.
 
 ## Input Context
-Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`. You MUST also check for and read `.devhive/memory/semantic.md` to integrate any historical rules into your task definitions.
+Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md` to integrate any historical rules into your task definitions.
+
+## Memory Access
+To search memory efficiently:
+1. First read `.devhive/memory/index.json` to see all memory entries
+2. Filter by tags relevant to your task (e.g., "architecture", "backend", "frontend", "devops")
+3. Read only the specific memory files you need (don't load everything)
+4. Prioritize memories with score >= 0.7 for critical decisions
 
 ## Playbook (What to Do)
 0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.

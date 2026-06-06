@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 import click
 from devhive_cli.templates_backend import generate_backend_agents_md
+from devhive_cli.memory import MemoryCLI, get_memory_cli, ensure_memory_dir
 
 # Paths configuration
 CLI_DIR = Path(__file__).resolve().parent
@@ -189,6 +190,87 @@ def init_backend():
         f.write(md_content)
         
     click.secho("✅ Successfully created AGENTS.md with Hexagonal Architecture guidelines!", fg="green", bold=True)
+
+
+@cli.group()
+def memory():
+    """Manage DevHive persistent memory."""
+    pass
+
+
+@memory.command()
+def list():
+    """List all memory entries."""
+    cli_instance = get_memory_cli()
+    cli_instance.list_entries()
+
+
+@memory.command()
+def show():
+    """Show all entries of a specific memory type."""
+    click.echo("Available types: semantic, episodic, anti_patterns")
+    entry_type = click.prompt("Memory type", type=click.Choice(['semantic', 'episodic', 'anti_patterns']))
+    cli_instance = get_memory_cli()
+    cli_instance.list_entries(entry_type)
+
+
+@memory.command()
+@click.argument("query")
+@click.option("--type", "entry_type", default=None, help="Filter by type (semantic, episodic, anti_patterns)")
+def search(query, entry_type):
+    """Search memory entries by query."""
+    cli_instance = get_memory_cli()
+    cli_instance.search_entries(query, entry_type)
+
+
+@memory.command()
+@click.argument("entry_id")
+def info(entry_id):
+    """Show detailed info for a memory entry."""
+    cli_instance = get_memory_cli()
+    cli_instance.show_entry(entry_id)
+
+
+@memory.command()
+@click.argument("entry_id")
+def delete(entry_id):
+    """Delete a memory entry by ID."""
+    cli_instance = get_memory_cli()
+    if click.confirm(f"Delete entry '{entry_id}'?"):
+        cli_instance.delete_entry(entry_id)
+
+
+@memory.command()
+def stats():
+    """Show memory statistics."""
+    cli_instance = get_memory_cli()
+    cli_instance.show_stats()
+
+
+@memory.command()
+@click.option("--type", "entry_type", default=None, help="Export specific type")
+@click.option("--output", "-o", "output_file", default=None, help="Output file path")
+def export(entry_type, output_file):
+    """Export memory entries to JSON."""
+    cli_instance = get_memory_cli()
+    cli_instance.export_memory(entry_type, output_file)
+
+
+@memory.command()
+@click.argument("input_file")
+def import_mem(input_file):
+    """Import memory entries from JSON file."""
+    cli_instance = get_memory_cli()
+    cli_instance.import_memory(input_file)
+
+
+@memory.command()
+@click.option("--threshold", default=0.5, help="Score threshold for garbage collection")
+def gc(threshold):
+    """Garbage collect memory entries below threshold."""
+    cli_instance = get_memory_cli()
+    cli_instance.garbage_collect(float(threshold))
+
 
 if __name__ == "__main__":
     cli()
