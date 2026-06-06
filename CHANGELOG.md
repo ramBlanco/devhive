@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.40] - 2026-06-05
+
+### Added
+- **devhive-analyzer Skill (Phase 0)**: New pre-orchestrator skill that runs before the SDD pipeline to analyze existing projects and propose memory entries for user approval.
+  - Analyzes `AGENTS.md`, `GUIDELINES.md`, package.json, and codebase structure
+  - Detects tech stack (FastAPI, Next.js, NestJS, etc.)
+  - Detects architecture patterns (Hexagonal, Feature-based, MVC, etc.)
+  - Extracts conventions and rules from existing documentation
+  - Proposes semantic and anti-pattern memories for user approval
+  - Only runs on first-time projects (when `.devhive/memory/` is empty)
+
+- **Orchestrator Phase 0 Integration**: Updated `devhive-orchestrator` to invoke `devhive-analyzer` as the first step when no prior memory exists.
+
+- **AGENTS.md Memory Extraction**: The analyzer now prioritizes extracting memories from `AGENTS.md` when it exists, as it contains explicit project rules and conventions with high confidence.
+
 ## [0.1.39] - 2026-06-05
 
 ### Added
