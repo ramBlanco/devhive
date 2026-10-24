@@ -6,7 +6,7 @@ description: Master orchestrator skill for the DevHive SDD pipeline.
 # DevHive Orchestrator Skill
 
 ## Overview
-This skill is the CEO/Orchestrator for the DevHive Skill-Driven Development (SDD) pipeline. Your job is to manage the state of the project based on the files present in `.devhive/specs/` and delegate the work to specialized sub-agent skills.
+This skill is the CEO/Orchestrator for the DevHive Skill-Driven Development (SDD) pipeline. Your job is to manage the state of the project based on `.devhive/specs/`, optionally ingest an approved PM package from `docs/PRODUCT/`, and delegate the work to specialized sub-agent skills.
 
 ## The Pipeline
 The typical SDD pipeline consists of the following phases and their corresponding output files:
@@ -36,6 +36,7 @@ The typical SDD pipeline consists of the following phases and their correspondin
 1. **Check State**: Look at the files in `.devhive/specs/`. Determine what the next missing phase is.
    - **Phase 0 (Analyzer)**: If no `.devhive/memory/index.json` exists OR if `.devhive/memory/` is empty, this is a FIRST-TIME project for DevHive. Invoke `devhive-analyzer` FIRST to analyze the project and propose memory entries. Only proceed to Phase 1 after analyzer completes.
    - If memory already exists (`.devhive/memory/index.json` has entries), SKIP the analyzer and go directly to Phase 1.
+   - **PM package preflight (before launching planning phases)**: Check whether `docs/PRODUCT/backlog.md` and `docs/PRODUCT/user-stories.md` exist. If a user-story package exists, read its status and Feature PRD reference. Treat PM artifacts as authoritative constraints only when the package says `Status: Approved` and matches the active Feature PRD; pass the paths/content and product/story IDs to each relevant planning phase. A Draft package requires explicit user approval before proceeding with that scope. If artifacts are stale or conflict with the active PRD, pause for clarification. Partial artifacts are optional context only; do not fabricate missing backlog items or stories. If no PM package exists, do not invoke PM-only skills and preserve the existing PRD-first pipeline.
 2. **Determine Sub-Skill**: Based on the missing phase, decide which skill to invoke.
    - If `00-prd.md` does not exist -> Invoke `devhive-prd`.
    - If `00-prd.md` exists but `01-exploration.md` does not -> Invoke `devhive-explorer`.
@@ -56,7 +57,7 @@ The typical SDD pipeline consists of the following phases and their correspondin
    - If `06-qa-plan.md` exists but `07-audit.md` does not -> Invoke `devhive-auditor`.
    - If `07-audit.md` exists but `08-reflection.md` does not -> Invoke `devhive-reflection`.
 3. **Launch Task**: Use the `Task` tool (with `subagent_type="general"`) to launch the sub-agent.
-   - **Prompt**: Instruct the sub-agent to strictly follow its corresponding DevHive skill. Instruct the sub-agent to read `.devhive/memory/` files (if they exist) for contextual constraints. If invoking `devhive-reflection`, you MUST pass a summary of the current chat history (human corrections and feedback) as input. Pass the user's initial request or context if needed.
+    - **Prompt**: Instruct the sub-agent to strictly follow its corresponding DevHive skill. Instruct the sub-agent to read `.devhive/memory/` files (if they exist) for contextual constraints. When PM preflight validated approved inputs, pass the Feature PRD, backlog/story artifact paths and contents, and require preservation of `PM-###`/`US-###` IDs and acceptance criteria. Do not require these paths when the PM package is absent. If invoking `devhive-reflection`, you MUST pass a summary of the current chat history (human corrections and feedback) as input. Pass the user's initial request or context if needed.
    - **Special Case - Analyzer**: When invoking `devhive-analyzer`, pass the current project directory context and indicate if an `AGENTS.md` or `GUIDELINES.md` file exists. Instruct the analyzer to prioritize extracting memories from these files if they exist.
 4. **Evaluate the Result**:
    - Verify that the sub-agent successfully created the required `.devhive/specs/XX-name.md` file (or checked off tasks in `04-tasks.md`).

@@ -9,7 +9,7 @@ description: Creates a formal feature proposal with scope and acceptance criteri
 When the orchestrator assigns you the proposal phase after exploration is complete.
 
 ## Input Context
-Read the `.devhive/specs/01-exploration.md` file to understand the exploration findings.
+Read `.devhive/specs/01-exploration.md` to understand the exploration findings. If the orchestrator supplied an approved PM package, also consult its Feature PRD, `docs/PRODUCT/backlog.md`, and `docs/PRODUCT/user-stories.md`; preserve story IDs and acceptance criteria in the proposal and flag conflicts. If no package is supplied, use the existing exploration/PRD context without requiring PM artifacts.
 
 ## Playbook (What to Do)
 0. **Load DevHive Skills (CRITICAL)**: Before starting, use the `skill` tool to load only skills bundled with DevHive. Do not install, download, or depend on external skills. If a skill is unavailable, ignore the error and proceed using your best judgment.

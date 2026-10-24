@@ -28,6 +28,15 @@ DevHive is composed of specialized Agent Skills that work sequentially:
 
 All of this is managed by the **`devhive-orchestrator`** skill.
 
+## Product Planning Skills
+
+DevHive bundles two skills for turning product requirements into reviewable user stories. They are available after `devhive install` or `devhive update-skill`. You can invoke them directly, and `@devhive-pm` also uses them in batch after generating a Feature PRD.
+
+- **`devhive-backlog`**: Give it PRD text or a readable PRD path to get small, user-centered stories traceable to the source. It calls out important ambiguity rather than inventing requirements. Example: “Use `devhive-backlog` to break down `.devhive/specs/00-prd.md` into user stories.”
+- **`devhive-story`**: Give it one selected story and, when useful, its source PRD/context. It returns exactly 2–3 Given/When/Then acceptance criteria and a mini plan of at most five bullets, then asks for review. Example: “Use `devhive-story` to refine US-001 from the approved backlog.”
+
+When used directly, review the backlog before selecting a story for refinement. In the PM workflow, the agent collects all story results into one package and requests a single consolidated review. Approval is required before handoff and never executes a mini plan. These skills are distinct from the PM agent's prioritized `docs/PRODUCT/backlog.md` artifact (MoSCoW/RICE), which is for product-level prioritization rather than story details.
+
 ## The Agents
 
 DevHive ships with two OpenCode agents:
@@ -48,7 +57,7 @@ Standalone product layer that sits **above** the SDD pipeline. It defines *what*
 @devhive-pm We need a way for customers to track their support tickets.
 ```
 
-The PM agent loads the bundled `devhive-prd` and `devhive-explorer` skills and produces:
+The PM agent loads the bundled `devhive-prd`, `devhive-explorer`, `devhive-backlog`, and `devhive-story` skills. It creates the prioritized product backlog before story refinement so each story can cross-reference its `PM-###` item, then produces:
 
 | Artifact | Contents |
 | --- | --- |
@@ -57,14 +66,17 @@ The PM agent loads the bundled `devhive-prd` and `devhive-explorer` skills and p
 | `docs/PRODUCT/metrics.md` | North Star metric, supporting KPIs, baselines and targets |
 | `docs/PRODUCT/roadmap.md` | Now / Next / Later horizons with dependencies |
 | `docs/PRODUCT/backlog.md` | Prioritized backlog (MoSCoW + RICE) with effort, value and risk |
+| `docs/PRODUCT/user-stories.md` | User stories linked to backlog items and PRD sections, each with Given/When/Then criteria and a mini plan of up to five task bullets; package is Draft until explicitly approved |
 | `docs/PRODUCT_REQUIREMENTS.md` | Master PRD (whole product) |
 | `.devhive/specs/00-prd.md` | Feature PRD for the current cycle |
 
-The PM agent never writes code. Its output ends with an explicit handoff command so the pipeline can pick up the work without re-discovery:
+The PM agent never writes code. It asks for one consolidated review of the story package. After the user approves, it marks the package `Approved` and provides an explicit handoff naming the PRD and both backlog/story artifacts:
 
 ```
-@devhive Implement the feature described in .devhive/specs/00-prd.md (backlog item PM-001).
+@devhive Implement the approved PM package for backlog item PM-001. Read .devhive/specs/00-prd.md, docs/PRODUCT/backlog.md, and docs/PRODUCT/user-stories.md.
 ```
+
+`@devhive` maps approved product backlog and story IDs plus their acceptance criteria into technical tasks in `.devhive/specs/04-tasks.md`. When invoked directly with no PM PRD/backlog/story package, it keeps the existing self-starting flow: creates its own Feature PRD, then runs the normal SDD phases. PM artifacts are optional inputs; Draft, stale, or conflicting packages are not silently treated as approved.
 
 ## Installation
 

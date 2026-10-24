@@ -9,7 +9,7 @@ description: Breaks down the architecture into actionable infrastructure, backen
 When the orchestrator assigns you the task planning phase after the architecture is designed.
 
 ## Input Context
-Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md` to integrate any historical rules into your task definitions.
+Read `.devhive/specs/03-architecture.md` and `.devhive/specs/02-proposal.md`. If the orchestrator supplies a PM package, also read the matching Feature PRD, `docs/PRODUCT/backlog.md`, and `docs/PRODUCT/user-stories.md`. Use PM product inputs only when the story package explicitly says `Status: Approved` and matches the active Feature PRD; otherwise pause for clarification or continue without treating the package as approved. If PM artifacts are absent, use the existing proposal/architecture inputs and do not require stories. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md` to integrate any historical rules into your task definitions.
 
 ## Memory Access
 To search memory efficiently:
@@ -21,19 +21,22 @@ To search memory efficiently:
 ## Playbook (What to Do)
 0. **Load DevHive Skills (CRITICAL)**: Before starting, use the `skill` tool to load only skills bundled with DevHive. Do not install, download, or depend on external skills. If a skill is unavailable, ignore the error and proceed using your best judgment.
 1. **Review Context**: Understand the architectural components, infrastructure needs, data models, design systems, and the acceptance criteria.
-2. **Define Design Tasks**: Define tasks for the Designer (e.g., configuring CSS vars, setting up Tailwind config, base visual skeleton).
-3. **Define Infrastructure Tasks**: If the architecture requires new databases, Terraform, Docker files, CI/CD pipelines, or cloud resources, define these as specific tasks.
-4. **Define Data Tasks**: Define tasks for the DBA (e.g., write Prisma schemas, run migrations, create seeders).
-5. **Define Backend Tasks**: Write specific tasks for the backend developer (e.g., API endpoints, server logic). **Crucially**, assign any general project setup tasks to this section so the project structure is ready first.
-6. **Define Frontend Tasks**: Write specific tasks for the frontend developer (e.g., UI components, state management, consuming the APIs).
-7. **Define Performance Tasks**: Write tasks for the Performance Tester (e.g., create k6 or artillery load test scripts).
-8. **Define Documentation Tasks**: Write tasks for the Tech Writer (e.g., update README, Swagger, OpenAPI specs).
-9. **Define Release Tasks**: Write tasks for the Release Manager (e.g., update package.json version, CHANGELOG.md, create local git tag).
-10. **Format the Output**: Ensure you strictly separate the output into the corresponding sections.
-11. **Empty Domains**: If a specific domain (e.g., Backend, Data, Infrastructure) is not needed for the project, DO NOT use checkboxes (`[ ]`). Instead, simply write "*None required*" under that section. This prevents the orchestrator from launching unnecessary agents.
+2. **Map Product Scope (when present)**: For each approved PM story requiring implementation, preserve its `PM-###` backlog ID, `US-###` story ID, and Given/When/Then acceptance criteria in the relevant technical task(s). Expand product mini-plan bullets into technical work only where needed; do not treat them as architecture or silently widen scope. Do not create implementation tasks for stories marked blocked. If no PM package is provided, do not invent product IDs and follow the existing PRD/proposal/architecture planning flow.
+3. **Define Design Tasks**: Define tasks for the Designer (e.g., configuring CSS vars, setting up Tailwind config, base visual skeleton).
+4. **Define Infrastructure Tasks**: If the architecture requires new databases, Terraform, Docker files, CI/CD pipelines, or cloud resources, define these as specific tasks.
+5. **Define Data Tasks**: Define tasks for the DBA (e.g., write Prisma schemas, run migrations, create seeders).
+6. **Define Backend Tasks**: Write specific tasks for the backend developer (e.g., API endpoints, server logic). **Crucially**, assign any general project setup tasks to this section so the project structure is ready first.
+7. **Define Frontend Tasks**: Write specific tasks for the frontend developer (e.g., UI components, state management, consuming the APIs).
+8. **Define Performance Tasks**: Write tasks for the Performance Tester (e.g., create k6 or artillery load test scripts).
+9. **Define Documentation Tasks**: Write tasks for the Tech Writer (e.g., update README, Swagger, OpenAPI specs).
+10. **Define Release Tasks**: Write tasks for the Release Manager (e.g., update package.json version, CHANGELOG.md, create local git tag).
+11. **Format the Output**: Ensure you strictly separate the output into the corresponding sections.
+12. **Empty Domains**: If a specific domain (e.g., Backend, Data, Infrastructure) is not needed for the project, DO NOT use checkboxes (`[ ]`). Instead, simply write "*None required*" under that section. This prevents the orchestrator from launching unnecessary agents.
 
 ## Output
 You MUST use the `Write` tool to save your plan to `.devhive/specs/04-tasks.md`.
+
+For **every applicable task in any domain section**, include `Product Backlog ID`, `User Story ID`, and `Acceptance Criteria` metadata (or explicit references) in the task details. The example below shows these optional metadata fields once; they are not limited to Design Tasks. Omit them for unrelated work and for the no-PM-artifact fallback.
 
 The markdown file should be structured as follows:
 
@@ -49,6 +52,9 @@ The markdown file should be structured as follows:
   - Description: [CSS vars, framework configuration]
   - Files: [Files to modify/create]
   - Skills: [Comma-separated list of bundled DevHive skills, or None]
+  - Product Backlog ID: [PM-###, when applicable]
+  - User Story ID: [US-###, when applicable]
+  - Acceptance Criteria: [Reference or concise Given/When/Then criteria, when applicable]
 
 ## Infrastructure Tasks
 [If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]

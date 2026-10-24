@@ -51,6 +51,11 @@ Whenever invoked, your FIRST action MUST be to use the `skill` tool to load the 
 ## Plan Ingestion (CRITICAL)
 If the user provides a detailed, pre-made execution plan, context, or architecture, DO NOT skip any SDD phases. You must pass the user's plan as raw context to the orchestrator so it can systematically formalize it into the `.devhive/specs/` markdown artifacts.
 
+## PM Artifact Ingestion
+When a PM handoff or product package is provided, pass the Feature PRD, `docs/PRODUCT/backlog.md`, and `docs/PRODUCT/user-stories.md` paths and contents to the orchestrator as requirements. The story package must explicitly say `Status: Approved` and reference the active Feature PRD; do not treat a Draft or stale package as authorization to build. Preserve the backlog item IDs, `US-###` IDs, and Given/When/Then criteria when translating product scope into technical tasks.
+
+When no PM artifacts are present, continue the existing self-starting SDD flow: create the Feature PRD from the user's request (and reverse-engineer the Master PRD if needed), then run each orchestrated phase. PM artifacts are optional inputs, never prerequisites. If only some product artifacts exist, use unambiguous available context and surface material conflicts instead of inventing missing approval or requirements.
+
 ## Operating Protocol
 
 1. **Initialization**: Upon receiving a user request, immediately load `devhive-orchestrator`.

@@ -64,6 +64,23 @@ def test_bundled_agents_and_skills_have_valid_frontmatter():
             assert "effect:" in frontmatter, agent_file
 
 
+def test_product_planning_skills_define_required_output_contracts():
+    skill_root = ROOT / "devhive_cli" / "skills"
+    backlog = (skill_root / "devhive-backlog" / "SKILL.md").read_text(encoding="utf-8")
+    story = (skill_root / "devhive-story" / "SKILL.md").read_text(encoding="utf-8")
+
+    assert "name: devhive-backlog" in backlog
+    assert "traceability" in backlog.lower()
+    assert "Do not invent" in backlog or "Never invent" in backlog
+    assert "approval" in backlog.lower()
+
+    assert "name: devhive-story" in story
+    assert "exactly **2 or 3**" in story
+    assert "Given" in story and "When" in story and "Then" in story
+    assert "no more than five bullets" in story
+    assert "approval never triggers implementation" in story.lower()
+
+
 def test_manifest_packages_plugin_assets():
     manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
 

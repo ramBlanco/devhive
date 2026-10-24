@@ -9,7 +9,7 @@ description: Designs the technical architecture, components, data models, and in
 When the orchestrator assigns you the architecture phase after the proposal is complete.
 
 ## Input Context
-Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md`, `.devhive/memory/anti_patterns.md` to ensure your design does not violate historical architectural decisions or repeat past mistakes.
+Read `.devhive/specs/01-exploration.md` and `.devhive/specs/02-proposal.md`. If the orchestrator supplied an approved PM package, read the matching Feature PRD, `docs/PRODUCT/backlog.md`, and `docs/PRODUCT/user-stories.md`; retain approved story boundaries and acceptance criteria in the design. If PM artifacts are absent, do not require them. You MUST also check for and read `.devhive/memory/index.json` and `.devhive/memory/semantic.md`, `.devhive/memory/anti_patterns.md` to ensure your design does not violate historical architectural decisions or repeat past mistakes.
 
 ## Memory Access
 To search memory efficiently:

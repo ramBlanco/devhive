@@ -23,6 +23,8 @@ def test_install_syncs_only_bundled_skills_and_agents(runner, isolated_home, mon
 
     skills_dir = isolated_home / ".config" / "opencode" / "skills"
     assert (skills_dir / "devhive-prd" / "SKILL.md").exists()
+    assert (skills_dir / "devhive-backlog" / "SKILL.md").exists()
+    assert (skills_dir / "devhive-story" / "SKILL.md").exists()
     assert (skills_dir / "frontend-design" / "SKILL.md").exists()
     assert not (skills_dir / "shadcn").exists()
     assert not (skills_dir / "prd").exists()
