@@ -1,6 +1,6 @@
+import json
 import os
 import shutil
-import subprocess
 from pathlib import Path
 import click
 from devhive_cli.templates_backend import generate_backend_agents_md
@@ -12,8 +12,26 @@ LOCAL_SKILLS_DIR = CLI_DIR / "skills"
 COMMUNITY_SKILLS_DIR = CLI_DIR / "community_skills"
 TEMPLATES_DIR = CLI_DIR / "templates"
 LOCAL_AGENTS_DIR = CLI_DIR / "agents"
-TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
-TARGET_AGENTS_DIR = Path.home() / ".config" / "opencode" / "agents"
+LOCAL_PLUGINS_DIR = CLI_DIR / "plugins"
+OPENCODE_CONFIG_DIR = Path.home() / ".config" / "opencode"
+TARGET_DIR = OPENCODE_CONFIG_DIR / "skills"
+TARGET_AGENTS_DIR = OPENCODE_CONFIG_DIR / "agents"
+TARGET_PLUGINS_DIR = OPENCODE_CONFIG_DIR / "plugins"
+TARGET_CONFIG_FILE = OPENCODE_CONFIG_DIR / "opencode.json"
+DEVHIVE_SKILL_PATTERNS = (
+    "devhive-*",
+    "architecture-patterns",
+    "backend-architect",
+    "backend-security-coder",
+    "docker-expert",
+    "frontend-design",
+    "frontend-developer",
+    "theme-factory",
+    "opencode",
+    "report",
+    "customize-opencode",
+)
+EXTERNAL_SKILL_NAMES = {"shadcn", "prd"}
 
 def handle_existing_agents_md(dest_path: Path) -> bool:
     """
@@ -54,17 +72,19 @@ LEGACY_SKILL_DIRS = [
     "backend-arthitect",
 ]
 
-
-def remove_legacy_skill_dirs():
-    """Delete skill directories from older DevHive versions that used legacy names."""
+def remove_obsolete_skills():
+    """Delete obsolete skill directories from older DevHive versions."""
     if not TARGET_DIR.exists():
         return
 
-    for legacy_name in LEGACY_SKILL_DIRS:
-        legacy_path = TARGET_DIR / legacy_name
-        if legacy_path.exists() and legacy_path.is_dir():
-            shutil.rmtree(legacy_path)
-            click.secho(f"Removed legacy skill: {legacy_name}", fg="yellow")
+    for obsolete_name in LEGACY_SKILL_DIRS:
+        obsolete_path = TARGET_DIR / obsolete_name
+        if obsolete_path.is_symlink():
+            obsolete_path.unlink()
+            click.secho(f"Removed obsolete skill link: {obsolete_name}", fg="yellow")
+        elif obsolete_path.exists() and obsolete_path.is_dir():
+            shutil.rmtree(obsolete_path)
+            click.secho(f"Removed obsolete skill: {obsolete_name}", fg="yellow")
 
 
 def sync_local_skills(clean=False):
@@ -79,22 +99,28 @@ def sync_local_skills(clean=False):
         
         click.secho(f"\nSyncing from {src_dir.name}...", fg="cyan", bold=True)
         for skill_path in src_dir.iterdir():
-            if skill_path.is_dir():
-                target_skill_path = TARGET_DIR / skill_path.name
-                
-                # If cleaning, remove existing before copying
-                if clean and target_skill_path.exists():
+            if not skill_path.is_dir():
+                continue
+            if not (skill_path / "SKILL.md").exists():
+                click.secho(
+                    f"Skipped invalid skill directory (missing SKILL.md): {skill_path.name}",
+                    fg="yellow",
+                )
+                continue
+
+            target_skill_path = TARGET_DIR / skill_path.name
+            if target_skill_path.exists():
+                if target_skill_path.is_symlink():
+                    target_skill_path.unlink()
+                elif target_skill_path.is_dir():
                     shutil.rmtree(target_skill_path)
-                    click.secho(f"Cleaned existing: {skill_path.name}", fg="yellow")
-                
-                if not target_skill_path.exists():
-                    shutil.copytree(skill_path, target_skill_path)
-                    click.secho(f"Installed: {skill_path.name}", fg="green")
                 else:
-                    # Update existing (removing first to avoid partial overrides)
-                    shutil.rmtree(target_skill_path)
-                    shutil.copytree(skill_path, target_skill_path)
-                    click.secho(f"Updated: {skill_path.name}", fg="blue")
+                    target_skill_path.unlink()
+                if clean:
+                    click.secho(f"Cleaned existing: {skill_path.name}", fg="yellow")
+
+            shutil.copytree(skill_path, target_skill_path)
+            click.secho(f"Installed: {skill_path.name}", fg="green")
 
 def sync_local_agents():
     if not TARGET_AGENTS_DIR.exists():
@@ -110,38 +136,204 @@ def sync_local_agents():
         shutil.copy2(agent_file, target_file)
         click.secho(f"Installed agent: {agent_file.name}", fg="green")
 
-def install_remote_skills():
-    click.secho("\nInstalling official remote skills via npx...", fg="cyan", bold=True)
-    commands = [
-        ["npx", "--yes", "skills", "add", "https://github.com/shadcn/ui", "--skill", "shadcn", "-y", "--global"],
-        ["npx", "--yes", "skills", "add", "https://github.com/github/awesome-copilot", "--skill", "prd", "-y", "--global"]
-    ]
-    
-    for cmd in commands:
-        click.secho(f"Running: {' '.join(cmd)}", fg="magenta")
+
+def sync_local_plugins():
+    """Install DevHive's plugin that exposes only bundled DevHive skills."""
+    if not TARGET_PLUGINS_DIR.exists():
+        TARGET_PLUGINS_DIR.mkdir(parents=True, exist_ok=True)
+
+    if not LOCAL_PLUGINS_DIR.exists():
+        click.secho(f"Warning: Source directory {LOCAL_PLUGINS_DIR} not found.", fg="yellow")
+        return
+
+    click.secho(f"\nSyncing plugins from {LOCAL_PLUGINS_DIR.name}...", fg="cyan", bold=True)
+    for plugin_file in LOCAL_PLUGINS_DIR.glob("*.ts"):
+        target_file = TARGET_PLUGINS_DIR / plugin_file.name
+        shutil.copy2(plugin_file, target_file)
+        click.secho(f"Installed plugin: {plugin_file.name}", fg="green")
+
+    package_file = LOCAL_PLUGINS_DIR / "package.json"
+    if package_file.exists():
+        shutil.copy2(package_file, TARGET_PLUGINS_DIR / package_file.name)
+        click.secho("Installed plugin package metadata", fg="green")
+
+    stale_node_modules = TARGET_PLUGINS_DIR / "node_modules" / "@opencode" / "plugin"
+    if stale_node_modules.is_symlink():
+        stale_node_modules.unlink()
+        click.secho("Removed stale DevHive plugin dependency link", fg="yellow")
+    elif stale_node_modules.exists() and stale_node_modules.is_dir():
+        shutil.rmtree(stale_node_modules)
+        click.secho("Removed stale DevHive plugin dependency", fg="yellow")
+
+
+def configure_devhive_skill_permissions():
+    """Restrict DevHive agents to DevHive's bundled skills."""
+    config = {}
+    if TARGET_CONFIG_FILE.exists():
         try:
-            subprocess.run(cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            click.secho(f"Error installing remote skill: {e}", fg="red")
+            config = json.loads(TARGET_CONFIG_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            click.secho(
+                f"Warning: Could not update {TARGET_CONFIG_FILE}: {exc}. "
+                "The file was left unchanged.",
+                fg="yellow",
+            )
+            return
+
+    agents = config.setdefault("agents", {})
+    if not isinstance(agents, dict):
+        agents = {}
+        config["agents"] = agents
+    if "agent" in config and isinstance(config["agent"], dict):
+        legacy_agent = config.pop("agent")
+        for agent_name, agent in legacy_agent.items():
+            if agent_name not in agents:
+                agents[agent_name] = agent
+    legacy_permission = config.get("permission")
+    if isinstance(legacy_permission, dict):
+        migrated_permissions = config.setdefault("permissions", [])
+        for action, value in legacy_permission.items():
+            if isinstance(value, str):
+                migrated_permissions.append(
+                    {"action": action, "resource": "*", "effect": value}
+                )
+            elif isinstance(value, dict):
+                for resource, effect in value.items():
+                    migrated_permissions.append(
+                        {"action": action, "resource": resource, "effect": effect}
+                    )
+        config.pop("permission", None)
+
+    for agent_name in ("devhive", "devhive-pm"):
+        agent = agents.setdefault(agent_name, {})
+        if not isinstance(agent, dict):
+            agent = {}
+            agents[agent_name] = agent
+        agent_permissions = agent.setdefault("permissions", [])
+        if not isinstance(agent_permissions, list):
+            agent_permissions = []
+            agent["permissions"] = agent_permissions
+        agent_permissions[:] = [
+            rule for rule in agent_permissions
+            if not (
+                isinstance(rule, dict)
+                and rule.get("action") == "skill"
+                and rule.get("resource") in {"*", *DEVHIVE_SKILL_PATTERNS}
+            )
+        ]
+        agent_permissions.insert(0, {"action": "skill", "resource": "*", "effect": "deny"})
+        for skill_pattern in DEVHIVE_SKILL_PATTERNS:
+            agent_permissions.append(
+                {"action": "skill", "resource": skill_pattern, "effect": "allow"}
+            )
+
+    TARGET_CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    TARGET_CONFIG_FILE.write_text(
+        json.dumps(config, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    click.secho("Configured DevHive agents to use only DevHive skills", fg="green")
+
+
+def remove_obsolete_external_skills():
+    """Remove external skills and remote skill sources from OpenCode."""
+    skill_roots = [
+        TARGET_DIR,
+        OPENCODE_CONFIG_DIR / "skill",
+        Path.home() / ".claude" / "skills",
+        Path.home() / ".agents" / "skills",
+        Path.cwd() / ".opencode" / "skills",
+        Path.cwd() / ".opencode" / "skill",
+        Path.cwd() / ".claude" / "skills",
+        Path.cwd() / ".agents" / "skills",
+        Path.cwd() / "skills",
+    ]
+
+    for root in skill_roots:
+        for name in EXTERNAL_SKILL_NAMES:
+            skill_path = root / name
+            if skill_path.is_symlink():
+                skill_path.unlink()
+                click.secho(f"Removed external skill link: {skill_path}", fg="yellow")
+            elif skill_path.exists() and skill_path.is_dir():
+                shutil.rmtree(skill_path)
+                click.secho(f"Removed external skill: {skill_path}", fg="yellow")
+
+    remove_remote_skill_sources()
+
+
+def remove_remote_skill_sources():
+    """Remove HTTP skill catalogs from the global OpenCode configuration."""
+    if not TARGET_CONFIG_FILE.exists():
+        return
+
+    try:
+        config = json.loads(TARGET_CONFIG_FILE.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        click.secho(
+            f"Warning: Could not update {TARGET_CONFIG_FILE}: {exc}. "
+            "The file was left unchanged.",
+            fg="yellow",
+        )
+        return
+
+    changed = False
+    sources = config.get("skills")
+    if isinstance(sources, list):
+        retained = []
+        for source in sources:
+            value = source.get("package", "") if isinstance(source, dict) else str(source)
+            if value.startswith(("http://", "https://")):
+                changed = True
+                continue
+            retained.append(source)
+        config["skills"] = retained
+
+    legacy_skill_config = config.get("skill")
+    if isinstance(legacy_skill_config, dict):
+        legacy_paths = legacy_skill_config.get("paths")
+        legacy_urls = legacy_skill_config.get("urls")
+        if isinstance(legacy_paths, list):
+            retained_paths = [
+                path
+                for path in legacy_paths
+                if not str(path).startswith(("http://", "https://"))
+            ]
+            legacy_skill_config["paths"] = retained_paths
+            changed = changed or len(retained_paths) != len(legacy_paths)
+        if isinstance(legacy_urls, list):
+            legacy_skill_config["urls"] = []
+            changed = changed or bool(legacy_urls)
+
+    if changed:
+        TARGET_CONFIG_FILE.write_text(
+            json.dumps(config, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        click.secho("Removed remote skill sources from OpenCode configuration", fg="yellow")
 
 @cli.command()
 def install():
-    """Install all devhive and community skills."""
+    """Install DevHive's bundled skills and agents only."""
     click.secho("Starting DevHive Skills Installation...", fg="green", bold=True)
-    remove_legacy_skill_dirs()
+    remove_obsolete_skills()
+    remove_obsolete_external_skills()
     sync_local_skills(clean=False)
     sync_local_agents()
-    install_remote_skills()
+    sync_local_plugins()
+    configure_devhive_skill_permissions()
     click.secho("\nInstallation Complete! 🎉", fg="green", bold=True)
 
 @cli.command()
 def update_skill():
-    """Update all skills (cleans existing ones and reinstalls)."""
+    """Update DevHive's bundled skills and agents only."""
     click.secho("Updating DevHive Skills...", fg="blue", bold=True)
-    remove_legacy_skill_dirs()
+    remove_obsolete_skills()
+    remove_obsolete_external_skills()
     sync_local_skills(clean=True)
     sync_local_agents()
-    install_remote_skills()
+    sync_local_plugins()
+    configure_devhive_skill_permissions()
     click.secho("\nUpdate Complete! 🚀", fg="green", bold=True)
 
 @cli.command()
@@ -201,8 +393,8 @@ def memory():
     pass
 
 
-@memory.command()
-def list():
+@memory.command(name="list")
+def list_entries():
     """List all memory entries."""
     cli_instance = get_memory_cli()
     cli_instance.list_entries()

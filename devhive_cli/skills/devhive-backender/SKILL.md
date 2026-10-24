@@ -20,7 +20,7 @@ To search memory efficiently:
 5. Check for "backend" and "bug" tagged episodic memories to avoid repeating past mistakes
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills, and ALWAYS load your hardcoded skills: `backend-security-coder`, `architecture-patterns`. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Load DevHive Skills (CRITICAL)**: Before starting, load the bundled `backend-security-coder` and `architecture-patterns` skills with the `skill` tool. Only skills bundled with DevHive may be loaded. Do not install, download, or depend on external skills. If a skill is unavailable, ignore the error and proceed using your best judgment.
 1. **Review Tasks**: Look at the unchecked `[ ]` tasks strictly under the `## Backend Tasks` section in `04-tasks.md`. Ignore any `## Infrastructure Tasks` or `## Frontend Tasks`.
 2. **Project Setup**: As the backend developer, you are often responsible for initializing the root project (e.g., `package.json`, `Cargo.toml`, setting up linters) before diving into the API logic. Check the tasks for these generic setup items.
 3. **API First Development**: Build the logic for the server, models, and endpoints. Assume the infrastructure (like databases) has been provisioned by the DevOps engineer. 

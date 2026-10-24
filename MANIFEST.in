@@ -2,4 +2,6 @@ recursive-include devhive_cli/skills *
 recursive-include devhive_cli/community_skills *
 recursive-include devhive_cli/templates *
 recursive-include devhive_cli/agents *
+recursive-include devhive_cli/plugins *
+include devhive_cli/plugins/package.json
 

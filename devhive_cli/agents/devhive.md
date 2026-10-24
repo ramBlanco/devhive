@@ -1,6 +1,42 @@
 ---
-name: devhive
 description: Autonomous Software Development Agent using Skill-Driven Development (SDD).
+permissions:
+  - action: skill
+    resource: "*"
+    effect: deny
+  - action: skill
+    resource: "devhive-*"
+    effect: allow
+  - action: skill
+    resource: architecture-patterns
+    effect: allow
+  - action: skill
+    resource: backend-architect
+    effect: allow
+  - action: skill
+    resource: backend-security-coder
+    effect: allow
+  - action: skill
+    resource: docker-expert
+    effect: allow
+  - action: skill
+    resource: frontend-design
+    effect: allow
+  - action: skill
+    resource: frontend-developer
+    effect: allow
+  - action: skill
+    resource: theme-factory
+    effect: allow
+  - action: skill
+    resource: opencode
+    effect: allow
+  - action: skill
+    resource: report
+    effect: allow
+  - action: skill
+    resource: customize-opencode
+    effect: allow
 ---
 
 # DevHive Agent

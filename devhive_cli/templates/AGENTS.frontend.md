@@ -7,17 +7,18 @@ This `AGENTS.md` (or `GUIDELINES.md`) file serves as the strict instruction manu
 - **Library**: React 19
 - **Language**: TypeScript (Strict Mode)
 - **Styling**: Tailwind CSS v3/v4 + `clsx` + `tailwind-merge`
-- **Components**: shadcn/ui (Radix UI primitives)
+- **Components**: Project's existing UI component library
 - **Icons**: Lucide React
 - **Data Fetching**: React Server Components (RSC) & Server Actions
 
-## 🧠 2. OpenCode Skills to Load
-Agents **MUST** load the following specialized skills before executing tasks:
+## 🧠 2. DevHive Skills to Load
+Agents **MUST** load these bundled DevHive skills before executing tasks:
 - `frontend-developer`: For modern React 19 / Next.js 15 patterns.
 - `frontend-design`: For high-quality, non-generic UI aesthetics.
-- `shadcn`: For proper installation and composition of shadcn/ui components.
 - `theme-factory`: For applying cohesive color palettes and typography.
 - `architecture-patterns`: For maintaining clean separation of concerns.
+
+Only skills bundled with DevHive may be loaded or installed. Do not install external skills.
 
 ## 📂 3. Project Structure (Feature-Based Architecture)
 For maximum scalability and maintainability, the project follows a feature-based architecture within the `src/` directory. 
@@ -29,7 +30,7 @@ src/
 │   ├── dashboard/        # Dashboard routes
 │   └── layout.tsx        # Root layout (Providers, Fonts, Metadata)
 ├── components/           
-│   ├── ui/               # Pure shadcn/ui components (DO NOT EDIT DIRECTLY unless styling)
+│   ├── ui/               # Project UI primitives (follow existing component conventions)
 │   └── shared/           # Reusable global components (Navbar, Footer, etc.)
 ├── features/             # Feature-based modules (THE CORE OF THE APP)
 │   ├── users/            # "Users" feature module
@@ -53,9 +54,10 @@ src/
    - Use Next.js Server Actions (`"use server"`) placed in `src/features/[name]/actions.ts`.
    - Always validate inputs inside Server Actions (using Zod or similar) before mutating data.
 
-3. **Shadcn/ui Usage**:
-   - Use the OpenCode CLI or `npx shadcn@latest add [component]` to install components.
-   - Combine UI components to build complex blocks (e.g., combining `Card`, `Button`, and `Input` to make a LoginForm).
+3. **UI Component Usage**:
+   - Reuse the project's existing UI primitives and follow its established component conventions.
+   - Combine existing UI components to build complex blocks (e.g., combining `Card`, `Button`, and `Input` to make a LoginForm).
+   - Do not install external component generators or skills as part of this project.
 
 4. **Type Safety**:
    - Avoid `any`. Define interfaces/types in `types.ts` files.
@@ -116,7 +118,7 @@ export async function updateUserName(formData: FormData): Promise<UpdateUserResp
 }
 ```
 
-### Example C: Client Component using Shadcn/ui & Server Actions
+### Example C: Client Component using the Project UI Library & Server Actions
 *File: `src/features/users/components/edit-name-form.tsx`*
 ```tsx
 "use client";
@@ -125,7 +127,7 @@ import { useState, useTransition } from "react";
 import { updateUserName } from "@/features/users/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast"; // shadcn toast
+import { toast } from "@/components/ui/use-toast"; // project toast primitive
 
 export function EditNameForm() {
   const [isPending, startTransition] = useTransition();

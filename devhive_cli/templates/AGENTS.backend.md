@@ -5,12 +5,14 @@ This `AGENTS.md` (or `GUIDELINES.md`) file serves as the strict instruction manu
 ## 🛠️ 1. Tech Stack
 {{TECH_STACK}}
 
-## 🧠 2. OpenCode Skills to Load
-Agents **MUST** load the following specialized skills before executing tasks:
+## 🧠 2. DevHive Skills to Load
+Agents **MUST** load the following bundled DevHive skills before executing tasks:
 - `architecture-patterns`: For maintaining clean separation of concerns and Hexagonal Architecture.
 - `backend-architect`: For scalable API design and domain modeling.
 - `backend-security-coder`: For secure coding practices, input validation, and auth.
 - `devhive-devops`: For {{IAC_TOOL}} infrastructure setup.
+
+Only skills bundled with DevHive may be loaded or installed. Do not install external skills.
 
 ## 📂 3. Project Structure (Hexagonal Architecture)
 For maximum scalability, testability, and maintainability, the project MUST strictly follow Hexagonal Architecture (Ports & Adapters).

@@ -71,7 +71,7 @@ Create proposed memory entries organized by type:
 Extract explicit rules like:
 - "Use Hexagonal Architecture" → semantic with tags ["architecture", "hexagonal"]
 - "API responses follow {success, data, error}" → semantic with tags ["api", "convention"]
-- "Use shadcn/ui components" → semantic with tags ["frontend", "shadcn", "ui"]
+- "Use the project's existing UI component library" → semantic with tags ["frontend", "ui", "components"]
 
 **From Code Detection → Semantic Memories:**
 - Stack detection (FastAPI, Next.js, etc.)

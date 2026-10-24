@@ -1,0 +1,8 @@
+{
+  "name": "devhive-skills-only",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./devhive-skills-only.ts"
+  }
+}

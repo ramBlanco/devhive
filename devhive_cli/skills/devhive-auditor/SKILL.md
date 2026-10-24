@@ -20,7 +20,7 @@ To search memory efficiently:
 5. Check for "security" and "anti-pattern" tagged memories to ensure no violations
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Load DevHive Skills (CRITICAL)**: Before starting, use the `skill` tool to load only skills bundled with DevHive. Do not install, download, or depend on external skills. If a skill is unavailable, ignore the error and proceed using your best judgment.
 1. **Consistency Check**: Verify that the implemented code matches the architecture (`03-architecture.md`) and proposal (`02-proposal.md`).
 2. **Security & Quality Audit**: Search for potential vulnerabilities, hardcoded secrets, or poor error handling.
 3. **Completeness Check**: Ensure all acceptance criteria are met and all tasks are completed.

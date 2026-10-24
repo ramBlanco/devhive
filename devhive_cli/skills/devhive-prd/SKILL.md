@@ -14,12 +14,6 @@ You must handle a **Hybrid PRD Approach**:
 
 ## Execution Flow
 
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
-
-
-Skills: 
-  - prd
-
 1. **Check for the Master PRD (`docs/PRODUCT_REQUIREMENTS.md`)**
    - If the file DOES NOT exist:
      - You must perform "Reverse Engineering". Use tools like `glob` and `read` to scan the current codebase (package.json, main application entry points, database schemas, etc.) to understand what the project is.
@@ -29,7 +23,7 @@ Skills:
 
 2. **Generate the Feature PRD (`.devhive/specs/00-prd.md`)**
    - Based on the user's specific request for this cycle, create the feature-level PRD.
-   - Use the following structure based on the awesome-copilot PRD template:
+   - Use the following DevHive PRD structure:
      ```markdown
      # Feature PRD: [Feature Name]
 

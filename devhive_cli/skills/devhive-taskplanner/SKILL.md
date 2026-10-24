@@ -19,7 +19,7 @@ To search memory efficiently:
 4. Prioritize memories with score >= 0.7 for critical decisions
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. Check `GUIDELINES.md` for global skills, check `04-tasks.md` for task-specific skills. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Load DevHive Skills (CRITICAL)**: Before starting, use the `skill` tool to load only skills bundled with DevHive. Do not install, download, or depend on external skills. If a skill is unavailable, ignore the error and proceed using your best judgment.
 1. **Review Context**: Understand the architectural components, infrastructure needs, data models, design systems, and the acceptance criteria.
 2. **Define Design Tasks**: Define tasks for the Designer (e.g., configuring CSS vars, setting up Tailwind config, base visual skeleton).
 3. **Define Infrastructure Tasks**: If the architecture requires new databases, Terraform, Docker files, CI/CD pipelines, or cloud resources, define these as specific tasks.
@@ -48,51 +48,51 @@ The markdown file should be structured as follows:
 - [ ] **Task 1: [Name]**
   - Description: [CSS vars, framework configuration]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Infrastructure Tasks
 [If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [What infrastructure needs to be provisioned]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Data Tasks
 [If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [Migrations, seeders, schema definitions]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Backend Tasks
 [If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [Initial project setup, API routes, server logic]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Frontend Tasks
 [If applicable, list tasks with `- [ ] **Task Name**`. Otherwise, write "*None required*"]
 - [ ] **Task 1: [Name]**
   - Description: [UI components, consuming backend APIs]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Performance Tasks
 - [ ] **Task 1: [Name]**
   - Description: [Load test scripts for critical paths]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Documentation Tasks
 - [ ] **Task 1: [Name]**
   - Description: [API docs, README updates, user manuals]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 
 ## Release Tasks
 - [ ] **Task 1: [Name]**
   - Description: [Version bump, CHANGELOG updates, local git tag]
   - Files: [Files to modify/create]
-  - Skills: [Comma-separated list of suggested opencode skills, or None]
+  - Skills: [Comma-separated list of bundled DevHive skills, or None]
 ```

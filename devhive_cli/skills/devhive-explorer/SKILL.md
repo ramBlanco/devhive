@@ -19,7 +19,7 @@ To search memory efficiently:
 4. Prioritize memories with score >= 0.7 for critical decisions
 
 ## Playbook (What to Do)
-0. **Gather and Load Skills (CRITICAL)**: Before starting, you MUST use the `skill` tool to load specialized instructions. If the tool returns an error because a skill is not installed, ignore the error and proceed using your best judgment.
+0. **Load DevHive Skills (CRITICAL)**: Before starting, use the `skill` tool to load only skills bundled with DevHive. Do not install, download, or depend on external skills. If a skill is unavailable, ignore the error and proceed using your best judgment.
 1. **Understand the Requirements**: Read `.devhive/specs/00-prd.md` to understand the specific feature, and `docs/PRODUCT_REQUIREMENTS.md` to understand the broader product context. Determine if it is a new feature, a bug fix, or a refactor.
 2. **Project Guidelines**: Use your tools to check if a `GUIDELINES.md` or `AGENTS.md` file exists in the root of the project.
    - **If YES**: Read it to understand the enforced tech stack and architectural rules.

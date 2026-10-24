@@ -8,12 +8,17 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="devhive",
-    version="0.1.42",
+    version="0.1.43",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
         "click>=8.0.0",
     ],
+    extras_require={
+        "test": [
+            "pytest>=7.0.0",
+        ],
+    },
     entry_points={
         "console_scripts": [
             "devhive=devhive_cli.main:cli",

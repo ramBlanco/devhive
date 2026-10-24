@@ -48,7 +48,7 @@ Standalone product layer that sits **above** the SDD pipeline. It defines *what*
 @devhive-pm We need a way for customers to track their support tickets.
 ```
 
-The PM agent loads the `prd`, `devhive-prd` and `devhive-explorer` skills and produces:
+The PM agent loads the bundled `devhive-prd` and `devhive-explorer` skills and produces:
 
 | Artifact | Contents |
 | --- | --- |
@@ -77,10 +77,10 @@ pip install devhive
 Once installed, you can use the CLI to setup or update your DevHive environment:
 
 ```bash
-# Install all official and community skills into OpenCode
+# Install DevHive's bundled skills and agents into OpenCode
 devhive install
 
-# Update your existing skills to the latest versions
+# Update DevHive's bundled skills and agents to the latest versions
 devhive update-skill
 
 # Initialize a modern Next.js/React frontend AI guidelines file in your current project
@@ -88,6 +88,26 @@ devhive init-frontend
 
 # Initialize a Hexagonal Architecture backend AI guidelines file (Interactive Prompt)
 devhive init-backend
+```
+
+DevHive installs only the skills bundled inside this package. It does not download, search for, or install third-party skills from GitHub or other external sources.
+
+The install and update commands also remove the previously installed external `shadcn` and `prd` skills, stale DevHive skill directories, remote skill URLs from the OpenCode configuration, and the obsolete DevHive plugin dependency. Other project-local skills under `.opencode/skills`, `.claude/skills`, `.agents/skills`, and `skills/` are preserved.
+
+DevHive writes OpenCode 2 configuration under `agents.<agent>.permissions` and preserves unrelated user configuration. Only the `devhive` and `devhive-pm` agents receive the strict DevHive skill allowlist; other agents keep their existing permissions. The bundled `devhive-skills-only` plugin keeps DevHive's bundled skills, OpenCode built-ins, and project-local skills available while removing external skills from the skill catalog.
+
+### Requirements
+
+- Python 3.7 or newer
+- OpenCode 2 (the bundled `devhive-skills-only` plugin uses the OpenCode 2 skill-transform API)
+
+### Tests
+
+Install the test dependencies and run the test suite:
+
+```bash
+pip install -e ".[test]"
+pytest
 ```
 
 ## Usage (The `@devhive` Agent)

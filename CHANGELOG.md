@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.43] - 2026-10-24
+
+### Removed
+- Removed automatic installation of third-party skills (`shadcn` and `prd`) from `devhive install` and `devhive update-skill`.
+- DevHive now installs only the skills and agents bundled with the package.
+- Removed runtime dependencies and instructions for external skills, including shadcn and awesome-copilot.
+- Added the `devhive-skills-only` OpenCode 2 plugin to keep DevHive's bundled skills, OpenCode built-ins, and project-local skills while filtering external skills.
+- Skill access restrictions now use OpenCode 2's `agents.<agent>.permissions` format and apply only to the `devhive` and `devhive-pm` agents; other OpenCode agents keep their existing permissions.
+- Install and update now remove stale external skill directories, remote skill URLs from the OpenCode configuration, obsolete DevHive skill directories, and the obsolete DevHive plugin dependency.
+- Removed the obsolete `skills-lock.json` file.
+- Added automated tests covering bundled-only installation, external skill cleanup, agent permissions, and the absence of external installers.
+
+
 ## [0.1.42] - 2026-10-24
 
 ### Removed
