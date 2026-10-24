@@ -66,6 +66,33 @@ def cli():
     """DevHive CLI for managing AI agent skills."""
     pass
 
+# Legacy skill directory names that used underscores. OpenCode derives the skill ID
+# from the directory path, so `devhive_prd/` was loadable as "devhive_prd" only.
+# The skills were renamed to hyphens (e.g. `devhive-prd/`) to match the `name`
+# declared in each SKILL.md. These legacy directories are removed on install so
+# stale duplicates do not linger in the target skills directory.
+LEGACY_SKILL_DIRS = [
+    "devhive_analyzer", "devhive_architect", "devhive_auditor", "devhive_backender",
+    "devhive_dba", "devhive_designer", "devhive_devops", "devhive_explorer",
+    "devhive_frontender", "devhive_orchestrator", "devhive_perf", "devhive_prd",
+    "devhive_proposal", "devhive_qa", "devhive_reflection", "devhive_releaser",
+    "devhive_sast", "devhive_taskplanner", "devhive_techwriter",
+    "backend-arthitect",
+]
+
+
+def remove_legacy_skill_dirs():
+    """Delete skill directories from older DevHive versions that used legacy names."""
+    if not TARGET_DIR.exists():
+        return
+
+    for legacy_name in LEGACY_SKILL_DIRS:
+        legacy_path = TARGET_DIR / legacy_name
+        if legacy_path.exists() and legacy_path.is_dir():
+            shutil.rmtree(legacy_path)
+            click.secho(f"Removed legacy skill: {legacy_name}", fg="yellow")
+
+
 def sync_local_skills(clean=False):
     if not TARGET_DIR.exists():
         TARGET_DIR.mkdir(parents=True, exist_ok=True)
@@ -127,6 +154,7 @@ def install_remote_skills():
 def install():
     """Install all devhive and community skills."""
     click.secho("Starting DevHive Skills Installation...", fg="green", bold=True)
+    remove_legacy_skill_dirs()
     sync_local_skills(clean=False)
     sync_local_agents()
     install_remote_skills()
@@ -136,6 +164,7 @@ def install():
 def update_skill():
     """Update all skills (cleans existing ones and reinstalls)."""
     click.secho("Updating DevHive Skills...", fg="blue", bold=True)
+    remove_legacy_skill_dirs()
     sync_local_skills(clean=True)
     sync_local_agents()
     install_remote_skills()

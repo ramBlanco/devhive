@@ -28,6 +28,44 @@ DevHive is composed of specialized Agent Skills that work sequentially:
 
 All of this is managed by the **`devhive-orchestrator`** skill.
 
+## The Agents
+
+DevHive ships with two OpenCode agents:
+
+### `@devhive` — The Software Engineer
+
+Autonomous software development agent. Hardwired to immediately start the SDD pipeline.
+
+```
+@devhive Build a script that converts CSV to JSON running on AWS Lambda.
+```
+
+### `@devhive-pm` — The Product Manager
+
+Standalone product layer that sits **above** the SDD pipeline. It defines *what* to build and *why*, then hands off to `@devhive` for *how*.
+
+```
+@devhive-pm We need a way for customers to track their support tickets.
+```
+
+The PM agent loads the `prd`, `devhive-prd` and `devhive-explorer` skills and produces:
+
+| Artifact | Contents |
+| --- | --- |
+| `docs/PRODUCT/product-vision.md` | Problem, audience, value proposition, principles, non-goals |
+| `docs/PRODUCT/stakeholders.md` | Stakeholder map, influence/interest, engagement strategy |
+| `docs/PRODUCT/metrics.md` | North Star metric, supporting KPIs, baselines and targets |
+| `docs/PRODUCT/roadmap.md` | Now / Next / Later horizons with dependencies |
+| `docs/PRODUCT/backlog.md` | Prioritized backlog (MoSCoW + RICE) with effort, value and risk |
+| `docs/PRODUCT_REQUIREMENTS.md` | Master PRD (whole product) |
+| `.devhive/specs/00-prd.md` | Feature PRD for the current cycle |
+
+The PM agent never writes code. Its output ends with an explicit handoff command so the pipeline can pick up the work without re-discovery:
+
+```
+@devhive Implement the feature described in .devhive/specs/00-prd.md (backlog item PM-001).
+```
+
 ## Installation
 
 DevHive is available as a Python package via PyPI. You can install it globally to manage your OpenCode skills across all your environments.
@@ -79,7 +117,7 @@ touch .devhive/continuous
 
 - **Zero Setup**: No Python servers, no MCP configuration, no background processes.
 - **Local Memory**: The entire state of the project is readable by humans in `.devhive/specs/`. You can edit `02-proposal.md` manually, and the Architect will adapt to your changes.
-- **Modular**: Need a different architectural approach? You can just tweak the prompt inside `skills/devhive_architect/SKILL.md`.
+- **Modular**: Need a different architectural approach? You can just tweak the prompt inside `skills/devhive-architect/SKILL.md`.
 
 ## License
 

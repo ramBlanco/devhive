@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.41] - 2026-10-24
+
+### Added
+- **`devhive-pm` Agent**: New standalone Product Manager agent for OpenCode, installed automatically via `devhive install` / `devhive update-skill`.
+  - Operates as the product layer above the SDD pipeline: defines *what* to build and *why*, hands off to `@devhive` for *how*.
+  - Loads the `prd` (awesome-copilot), `devhive-prd` and `devhive-explorer` skills, with graceful degradation when the optional remote `prd` skill is not installed.
+  - Produces product artifacts under `docs/PRODUCT/`: `product-vision.md`, `stakeholders.md`, `metrics.md`, `roadmap.md` and `backlog.md` (MoSCoW + RICE prioritization).
+  - Maintains the existing Hybrid PRD contract by writing `docs/PRODUCT_REQUIREMENTS.md` (Master PRD) and `.devhive/specs/00-prd.md` (Feature PRD).
+  - Ends with an explicit handoff command for the SDD pipeline, avoiding re-discovery.
+  - Strictly scoped to documentation: never writes code or makes architecture decisions.
+
+### Fixed
+- **Skill IDs no longer resolvable**: OpenCode derives a skill's ID from its **directory path**, and the `name` field in `SKILL.md` frontmatter is only a display name. The DevHive skill directories used underscores (`devhive_prd/`) while every `SKILL.md` declared `name: devhive-prd`, so the `skill` tool could not load them by the name referenced throughout the pipeline. All 19 DevHive skill directories are now hyphenated (`devhive-prd/`, `devhive-orchestrator/`, ...), matching their declared names, so `skill("devhive-prd")` and `skill("devhive-orchestrator")` now resolve correctly.
+  - The community skill `backend-arthitect` was renamed to `backend-architect` for the same reason.
+  - `devhive install` and `devhive update-skill` now remove the legacy underscore-named directories from the target skills folder so stale duplicates cannot shadow the corrected ones.
+
+### Changed
+- **README**: Documented the two available agents (`@devhive` and `@devhive-pm`) and the artifact set produced by the PM.
+
 ## [0.1.40] - 2026-06-05
 
 ### Added
