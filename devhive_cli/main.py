@@ -15,51 +15,25 @@ LOCAL_AGENTS_DIR = CLI_DIR / "agents"
 TARGET_DIR = Path.home() / ".config" / "opencode" / "skills"
 TARGET_AGENTS_DIR = Path.home() / ".config" / "opencode" / "agents"
 
-ZERO_TOUCH_POLICY = """# 🛑 SYSTEM DIRECTIVE: ZERO-TOUCH POLICY (DevHive Enforcement)
-**CRITICAL INSTRUCTION FOR ALL AI AGENTS:**
-This project strictly uses **DevHive (Skill-Driven Development)**. As a general AI agent, you are FORBIDDEN from directly modifying source code, creating files, or writing implementation logic for feature requests.
-
-When asked to build a feature, fix a bug, or apply changes, you MUST NOT do it yourself. Instead, your ONLY job is to delegate the task by invoking the DevHive orchestrator.
-
-**How to apply changes:**
-If you have access to tool calling, immediately invoke the `devhive` agent or load the `devhive-orchestrator` skill, passing the user's exact request to it. Do not attempt to bypass this pipeline.
-
----
-"""
-
-
 def handle_existing_agents_md(dest_path: Path) -> bool:
     """
     Handles the case where AGENTS.md already exists.
-    Returns True if the caller should proceed to overwrite the file, False otherwise.
+
+    DevHive never modifies a pre-existing guidance file. If AGENTS.md is already
+    present the command refuses to run and leaves the file untouched.
+
+    Returns True if the caller should proceed to write the file, False otherwise.
     """
-    with open(dest_path, "r") as f:
-        content = f.read()
-        
-    if "ZERO-TOUCH POLICY" in content:
-        click.secho("AGENTS.md already exists and is up to date with DevHive policies.", fg="yellow")
-        return False
-        
-    click.secho("⚠️ AGENTS.md already exists, but it is missing the critical DevHive Zero-Touch Policy.", fg="yellow")
-    action = click.prompt(
-        "Do you want to:\n"
-        "  [i]nject the policy at the top (preserves your file)\n"
-        "  [o]verwrite the entire file with a new template\n"
-        "  [a]bort\n"
-        "Action",
-        type=click.Choice(['i', 'o', 'a'], case_sensitive=False)
+    click.secho(
+        f"⚠️ {dest_path.name} already exists. It was left untouched.",
+        fg="yellow",
     )
-    
-    if action == 'i':
-        with open(dest_path, "w") as f:
-            f.write(ZERO_TOUCH_POLICY + "\n" + content)
-        click.secho("✅ Zero-Touch Policy injected successfully! Your existing content was preserved.", fg="green", bold=True)
-        return False
-    elif action == 'o':
-        return True
-    else:
-        click.secho("Aborted.", fg="yellow")
-        return False
+    click.secho(
+        "DevHive will not overwrite or inject content into an existing guidance file.\n"
+        "Delete or rename it manually if you want to generate a fresh template.",
+        fg="yellow",
+    )
+    return False
 
 @click.group()
 def cli():

@@ -117,14 +117,14 @@ After approval:
 1. Create `.devhive/memory/` directory
 2. Create `index.json` with proper structure
 3. Write memories to `semantic.md`, `episodic.md`, `anti_patterns.md` with ID comments
-4. Optionally create/enhance `GUIDELINES.md` with detected stack
-5. Return control to orchestrator
+4. Return control to orchestrator
+
+**DO NOT create or modify `GUIDELINES.md`, `AGENTS.md`, or any other guidance file in the project root.** The detected stack is reported in your output and persisted only in the memory files. DevHive never writes guidance files into the user's project.
 
 ## Output
 - `.devhive/memory/index.json` - Memory index with all entries
 - `.devhive/memory/semantic.md` - Semantic memories
 - `.devhive/memory/anti_patterns.md` - Anti-pattern memories (if any)
-- Optionally updated `GUIDELINES.md`
 - Control passed to `devhive-orchestrator`
 
 ## Memory Entry Format

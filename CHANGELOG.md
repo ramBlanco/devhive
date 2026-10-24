@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.42] - 2026-10-24
+
+### Removed
+- **Zero-Touch Policy**: The "🛑 SYSTEM DIRECTIVE: ZERO-TOUCH POLICY" block that forbade AI agents from writing code directly (and forced delegation to the DevHive orchestrator) has been removed entirely.
+  - Deleted the `ZERO_TOUCH_POLICY` constant and the injection logic from `devhive_cli/main.py`.
+  - Stripped the directive from the `AGENTS.frontend.md` and `AGENTS.backend.md` templates, so newly generated guidance files no longer contain it.
+  - `devhive init-frontend` / `devhive init-backend` now **refuse to run** when an `AGENTS.md` already exists: the existing file is never overwritten, never injected into, and never modified in any way. The user is asked to delete or rename it manually.
+  - The `devhive-explorer` and `devhive-analyzer` skills no longer create or enhance `GUIDELINES.md` in the project root. When no guidance file exists, the detected stack is reported in the phase output and persisted only inside `.devhive/memory/`.
+
+### Changed
+- **`devhive init-frontend` / `devhive init-backend`**: These commands are now strictly non-destructive — they only ever create a guidance file in a directory where none exists.
+
 ## [0.1.41] - 2026-10-24
 
 ### Added
