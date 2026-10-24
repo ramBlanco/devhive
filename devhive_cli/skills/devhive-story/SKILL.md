@@ -16,7 +16,7 @@ Use when the user supplies or selects one user story and wants acceptance criter
 - **PM batch mode:** When `devhive-pm` explicitly requests batch refinement, return the completed result to PM without a separate user-facing approval prompt. If essential context is missing, return the story as `Blocked` with focused open questions; do not invent criteria or a plan. PM collects blocked items/questions and presents them with the entire package for one user review.
 
 ## Inputs
-- One selected user story (required).
+- One selected user story (required). In PM batch mode, preserve its related `PM-###` backlog-item ID in the refined output.
 - Its source PRD, relevant requirements, or additional product context (optional, but use it when available).
 
 If no story is supplied, ask the user to provide or select one. If essential behavior or context is missing, ask a focused clarification before drafting. Do not turn an unresolved assumption into a requirement.
@@ -29,10 +29,13 @@ If no story is supplied, ask the user to provide or select one. If essential beh
 5. Return the draft. In standalone mode, explicitly invite the user to approve or request changes. In PM batch mode, return control to PM without prompting the user per story. Approval never triggers implementation.
 
 ## Output
-When context is sufficient, return this Markdown structure:
+When context is sufficient, return this Markdown structure. Include `Product Backlog Item` only when the PM caller supplied a parent ID; never leave an empty placeholder:
 
 ```markdown
 # Story: [Selected story title]
+
+## Product Backlog Item
+[PM-### when supplied by the PM caller]
 
 ## User Story
 [Restate the selected story faithfully.]

@@ -57,7 +57,7 @@ Standalone product layer that sits **above** the SDD pipeline. It defines *what*
 @devhive-pm We need a way for customers to track their support tickets.
 ```
 
-The PM agent loads the bundled `devhive-prd`, `devhive-explorer`, `devhive-backlog`, and `devhive-story` skills. It creates the prioritized product backlog before story refinement so each story can cross-reference its `PM-###` item, then produces:
+The PM agent loads the bundled `devhive-prd`, `devhive-explorer`, `devhive-backlog`, and `devhive-story` skills. It creates the prioritized product backlog before story refinement, then produces at least one story for every in-scope `PM-###` item (multiple stories when an item represents independent outcomes). Each artifact cross-references `PM-###` and `US-###`; items marked `Won't have (this iteration)` do not require stories.
 
 | Artifact | Contents |
 | --- | --- |
@@ -65,18 +65,18 @@ The PM agent loads the bundled `devhive-prd`, `devhive-explorer`, `devhive-backl
 | `docs/PRODUCT/stakeholders.md` | Stakeholder map, influence/interest, engagement strategy |
 | `docs/PRODUCT/metrics.md` | North Star metric, supporting KPIs, baselines and targets |
 | `docs/PRODUCT/roadmap.md` | Now / Next / Later horizons with dependencies |
-| `docs/PRODUCT/backlog.md` | Prioritized backlog (MoSCoW + RICE) with effort, value and risk |
-| `docs/PRODUCT/user-stories.md` | User stories linked to backlog items and PRD sections, each with Given/When/Then criteria and a mini plan of up to five task bullets; package is Draft until explicitly approved |
+| `docs/PRODUCT/backlog.md` | Prioritized backlog (MoSCoW + RICE) with effort, value and risk, plus related `US-###` IDs |
+| `docs/PRODUCT/user-stories.md` | Stories grouped by backlog item and PRD source, each with Given/When/Then criteria and a mini plan of up to five task bullets; package is Draft until explicitly approved |
 | `docs/PRODUCT_REQUIREMENTS.md` | Master PRD (whole product) |
 | `.devhive/specs/00-prd.md` | Feature PRD for the current cycle |
 
-The PM agent never writes code. It asks for one consolidated review of the story package. After the user approves, it marks the package `Approved` and provides an explicit handoff naming the PRD and both backlog/story artifacts:
+The PM agent never writes code. It asks for one consolidated review of the story package. After the user approves, it marks the package `Approved`; the user can then choose one unblocked story for implementation:
 
 ```
-@devhive Implement the approved PM package for backlog item PM-001. Read .devhive/specs/00-prd.md, docs/PRODUCT/backlog.md, and docs/PRODUCT/user-stories.md.
+@devhive Implement story US-003 from backlog item PM-002 in the approved PM package. Read .devhive/specs/00-prd.md, docs/PRODUCT/backlog.md, and docs/PRODUCT/user-stories.md.
 ```
 
-`@devhive` maps approved product backlog and story IDs plus their acceptance criteria into technical tasks in `.devhive/specs/04-tasks.md`. When invoked directly with no PM PRD/backlog/story package, it keeps the existing self-starting flow: creates its own Feature PRD, then runs the normal SDD phases. PM artifacts are optional inputs; Draft, stale, or conflicting packages are not silently treated as approved.
+`@devhive` validates the selected story and maps only its backlog/story IDs and acceptance criteria into technical tasks in `.devhive/specs/04-tasks.md`; it asks for a story selection rather than defaulting to the first story or implementing the entire package. When invoked directly with no PM PRD/backlog/story package, it keeps the existing self-starting flow: creates its own Feature PRD, then runs the normal SDD phases. PM artifacts are optional inputs; Draft, stale, or conflicting packages are not silently treated as approved.
 
 ## Installation
 

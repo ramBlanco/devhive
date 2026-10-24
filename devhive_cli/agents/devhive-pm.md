@@ -88,7 +88,7 @@ Create or update `docs/PRODUCT/roadmap.md`:
 - Explicitly mark items that are candidates for the SDD pipeline
 
 Create or update `docs/PRODUCT/backlog.md`:
-- One row per item: `ID | Title | Description | MoSCoW | Reach | Impact | Confidence | Effort | RICE | Risk | Status`
+- One row per item: `ID | Title | Description | MoSCoW | Reach | Impact | Confidence | Effort | RICE | Risk | Status | Story IDs`
 - MoSCoW: `Must have` / `Should have` / `Could have` / `Won't have (this iteration)`
 - RICE = (Reach × Impact × Confidence) / Effort. Use this fixed scale and state it in the file:
   - **Reach**: affected users per month (absolute count)
@@ -102,15 +102,16 @@ Create or update `docs/PRODUCT/backlog.md`:
 
 ### Step 6 — User Stories and Mini-Plan Tasks
 
-After the Feature PRD and prioritized backlog are ready, use the already-loaded `devhive-backlog` skill methodology to decompose the PRD into small, traceable user stories. For each returned story, use `devhive-story` with that story and relevant PRD context. Run this as a batch: do not ask the user to approve or select each story individually.
+After the Feature PRD and prioritized backlog are ready, pass both the PRD and the complete prioritized backlog (including every `PM-###` ID) to `devhive-backlog`. Work through every backlog item; do not derive stories from the PRD alone or stop after the first item. Every item except those explicitly marked `Won't have (this iteration)` must map to at least one story, and an item may map to multiple stories when it represents independent outcomes. Refine every resulting story with `devhive-story`, preserving its `PM-###` parent. Check coverage in both directions before publishing: no in-scope backlog item without a story, and no story without a valid backlog item. Mark uncovered or insufficiently specified items as blocked with an open question; do not invent stories or criteria. Run this as a batch: do not ask the user to approve or select each story individually.
 
 Create or update `docs/PRODUCT/user-stories.md` with:
 - Package header: `Status: Draft`, Feature PRD path/title, and related PM backlog item ID(s).
 - One section per story, preserving its stable `US-###` ID, title, user-story statement, and source PRD reference.
+- The parent `PM-###` backlog item for every story; group or index stories by backlog item so a user can select a specific `US-###` later.
 - Exactly 2–3 testable acceptance criteria, each containing Given/When/Then.
 - A mini plan of one to five concise bullets per sufficiently specified story.
 - Open questions and an explicit `Blocked` status for stories that cannot be refined from available context. Do not invent criteria or mini tasks for blocked stories.
-- A cross-reference from each story to its related `PM-###` backlog item. Keep the prioritized PM backlog and this story package as separate artifacts.
+- A cross-reference from each story to its related `PM-###` backlog item, and the corresponding `US-###` IDs in the backlog's `Story IDs` column. Keep the prioritized PM backlog and this story package as separate artifacts. Verify the complete bidirectional mapping before requesting approval.
 
 After all stories are collected, present the artifact set for **one consolidated user review**. Keep the package status `Draft` until the user explicitly approves. On approval, update the package header to `Status: Approved`; this permits handoff only and does not authorize implementation of mini plans.
 
@@ -119,14 +120,14 @@ After all stories are collected, present the artifact set for **one consolidated
 End with an explicit handoff block so the pipeline can pick up the work without re-discovery. State:
 - The artifact paths produced (all `docs/PRODUCT/*` files plus `docs/PRODUCT_REQUIREMENTS.md` and `.devhive/specs/00-prd.md`)
 - The `docs/PRODUCT/user-stories.md` package status; do not hand off as approved unless the user explicitly approved it
-- The single `Must have` item recommended for this cycle
-- The exact command to hand off, e.g.:
+- A recommended next `US-###` and its parent `PM-###`; the user may select any other approved, unblocked story
+- The exact command template to hand off the selected story, e.g.:
 
 ```
-@devhive Implement the approved PM package for backlog item PM-001. Read .devhive/specs/00-prd.md, docs/PRODUCT/backlog.md, and docs/PRODUCT/user-stories.md.
+@devhive Implement story US-001 from backlog item PM-001 in the approved PM package. Read .devhive/specs/00-prd.md, docs/PRODUCT/backlog.md, and docs/PRODUCT/user-stories.md.
 ```
 
-If user approval has not yet been received, present the complete artifact paths and ask for review; do not emit a command that implies the package is approved.
+If user approval has not yet been received, present the complete artifact paths and ask for review; do not emit a command that implies the package is approved. The user selects the story to implement after approval; never imply that approving the package executes any story.
 
 ## Scope Rules (STRICT)
 
