@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.46] - 2026-10-31
+
+### Added
+- Per-story execution status (`Pending`, `In Progress`, `Completed`) in PM user-story packages.
+- A DevHive preflight that detects pending stories and incomplete tasks, requests direction when execution was not explicitly authorized, and runs authorized pending stories sequentially in backlog priority order.
+
+### Changed
+- DevHive now validates package approval, PRD alignment, story blocking, and prior execution status before implementation; legacy approved stories without an execution status are treated as pending.
+- Story execution progress is preserved and only marked complete after implementation and QA/audit validation succeed.
+
 ## [0.1.45] - 2026-10-24
 
 ### Added,
