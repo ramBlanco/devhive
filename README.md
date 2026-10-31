@@ -66,17 +66,17 @@ The PM agent loads the bundled `devhive-prd`, `devhive-explorer`, `devhive-backl
 | `docs/PRODUCT/metrics.md` | North Star metric, supporting KPIs, baselines and targets |
 | `docs/PRODUCT/roadmap.md` | Now / Next / Later horizons with dependencies |
 | `docs/PRODUCT/backlog.md` | Prioritized backlog (MoSCoW + RICE) with effort, value and risk, plus related `US-###` IDs |
-| `docs/PRODUCT/user-stories.md` | Stories grouped by backlog item and PRD source, each with Given/When/Then criteria and a mini plan of up to five task bullets; package is Draft until explicitly approved |
+| `docs/PRODUCT/user-stories.md` | Stories grouped by backlog item and PRD source, each with Given/When/Then criteria, a mini plan of up to five task bullets, and an independent execution status (`Pending`, `In Progress`, or `Completed`); package is Draft until explicitly approved |
 | `docs/PRODUCT_REQUIREMENTS.md` | Master PRD (whole product) |
 | `.devhive/specs/00-prd.md` | Feature PRD for the current cycle |
 
-The PM agent never writes code. It asks for one consolidated review of the story package. After the user approves, it marks the package `Approved`; the user can then choose one unblocked story for implementation:
+The PM agent never writes code. It asks for one consolidated review of the story package. After the user approves, it marks the package `Approved`; approval alone does not authorize implementation. On startup, `@devhive` checks for pending stories and unchecked tasks in `.devhive/specs/04-tasks.md`. If execution was not explicitly requested, it lists the pending work and asks whether to execute it, select specific items, or defer it. A request to execute all pending work runs eligible stories one at a time in backlog priority order, updating each story's execution status. A request naming one story remains scoped to that story.
 
 ```
 @devhive Implement story US-003 from backlog item PM-002 in the approved PM package. Read .devhive/specs/00-prd.md, docs/PRODUCT/backlog.md, and docs/PRODUCT/user-stories.md.
 ```
 
-`@devhive` validates the selected story and maps only its backlog/story IDs and acceptance criteria into technical tasks in `.devhive/specs/04-tasks.md`; it asks for a story selection rather than defaulting to the first story or implementing the entire package. When invoked directly with no PM PRD/backlog/story package, it keeps the existing self-starting flow: creates its own Feature PRD, then runs the normal SDD phases. PM artifacts are optional inputs; Draft, stale, or conflicting packages are not silently treated as approved.
+`@devhive` validates each selected story and maps only its backlog/story IDs and acceptance criteria into technical tasks in `.devhive/specs/04-tasks.md`; it never defaults to the first story or implements the entire package without explicit authorization. Legacy approved stories with no execution-status field are treated as pending. When invoked directly with no PM PRD/backlog/story package, it keeps the existing self-starting flow: creates its own Feature PRD, then runs the normal SDD phases. PM artifacts are optional inputs; Draft, stale, blocked, or conflicting packages are not silently treated as approved.
 
 ## Installation
 

@@ -107,6 +107,7 @@ After the Feature PRD and prioritized backlog are ready, pass both the PRD and t
 Create or update `docs/PRODUCT/user-stories.md` with:
 - Package header: `Status: Draft`, Feature PRD path/title, and related PM backlog item ID(s).
 - One section per story, preserving its stable `US-###` ID, title, user-story statement, and source PRD reference.
+- An `Execution Status: Pending` field for every new story. This is separate from the package approval status and from product-refinement blocking: only DevHive changes it to `In Progress` or `Completed` during implementation. Preserve an existing execution status when updating artifacts; never reset completed or in-progress stories to pending.
 - The parent `PM-###` backlog item for every story; group or index stories by backlog item so a user can select a specific `US-###` later.
 - Exactly 2–3 testable acceptance criteria, each containing Given/When/Then.
 - A mini plan of one to five concise bullets per sufficiently specified story.
@@ -121,6 +122,7 @@ End with an explicit handoff block so the pipeline can pick up the work without 
 - The artifact paths produced (all `docs/PRODUCT/*` files plus `docs/PRODUCT_REQUIREMENTS.md` and `.devhive/specs/00-prd.md`)
 - The `docs/PRODUCT/user-stories.md` package status; do not hand off as approved unless the user explicitly approved it
 - A recommended next `US-###` and its parent `PM-###`; the user may select any other approved, unblocked story
+- The execution status of each story, so `@devhive` can identify work that has not yet been implemented
 - The exact command template to hand off the selected story, e.g.:
 
 ```

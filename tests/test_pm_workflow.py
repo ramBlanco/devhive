@@ -66,10 +66,39 @@ def test_devhive_orchestrator_checks_approval_and_keeps_prd_first_fallback():
     assert "Partial artifacts are optional context only" in orchestrator
     assert "preserve the existing PRD-first pipeline" in orchestrator
     assert "stale or conflict" in orchestrator
-    assert "must select one specific `US-###`" in orchestrator
-    assert "rather than choosing the first story" in orchestrator
+    assert "A request naming one `US-###` authorizes only that validated story" in orchestrator
+    assert "do not default to the first story" in agent
     assert "explicitly scope the phase to that story" in orchestrator
     assert "do not default to the first story" in agent
+
+
+def test_devhive_checks_pending_work_and_requires_explicit_execution_authorization():
+    agent = read("agents/devhive.md")
+    orchestrator = read("skills/devhive-orchestrator/SKILL.md")
+
+    assert "Pending Work Preflight" in agent
+    assert "Execution Status: Pending" in agent
+    assert "unchecked `[ ]` technical tasks" in agent
+    assert "did not explicitly ask to execute it" in agent
+    assert "offer to execute all eligible pending work" in agent
+    assert "Draft package exists" in agent
+    assert "Status: Approved" in orchestrator
+    assert "missing execution status in a legacy approved package as `Execution Status: Pending`" in orchestrator
+    assert "all pending stories" in orchestrator
+    assert "backlog priority order, then `US-###` order" in orchestrator
+    assert "one story at a time" in orchestrator
+    assert "story-specific artifacts" in orchestrator
+    assert "do not infer the next story is complete from files or checked tasks left by a previous story" in orchestrator
+    assert "Set the story's `Execution Status` to `In Progress`" in orchestrator
+    assert "to `Completed` only after implementation plus required QA/audit validation succeeds" in orchestrator
+
+
+def test_pm_stories_have_independent_execution_status():
+    pm = read("agents/devhive-pm.md")
+
+    assert "`Execution Status: Pending`" in pm
+    assert "separate from the package approval status" in pm
+    assert "never reset completed or in-progress stories to pending" in pm
 
 
 def test_planning_phases_and_taskplanner_preserve_pm_story_traceability():
